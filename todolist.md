@@ -2,7 +2,7 @@
 
 Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Portal".
 
-**Kemajuan Keseluruhan: 82%**
+**Kemajuan Keseluruhan: 95%**
 
 ---
 
@@ -33,17 +33,17 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Hubungkan ke koleksi "users" di Firestore.
   - [x] Buat fungsionalitas CRUD (Create, Read, Update, Delete) untuk pengguna.
 
-- [x] **GUI (40%)**
+- [x] **GUI (95%)**
   - [x] Buat halaman GUI dengan struktur tab yang benar.
-  - [x] Hubungkan tab "Kelola Sumber Daya" ke koleksi `resources` Firestore.
-  - [ ] Implementasikan Formulir & Tabel untuk setiap tab.
-  - [ ] Hubungkan setiap tab ke koleksi Firestore yang sesuai.
+  - [x] Implementasikan Formulir & Tabel untuk setiap tab (Resources, Routes, Brokers, Network, Configs, Data Requests).
+  - [x] Hubungkan setiap tab ke koleksi Firestore yang sesuai.
+  - [ ] Implementasikan fungsionalitas "Container Management" dan "Data Sources".
 
-- [ ] **Manajemen Data (10%)**
+- [x] **Manajemen Data (100%)**
   - [x] Buat halaman placeholder Manajemen Data.
-  - [ ] Hubungkan ke koleksi Firestore (resources, contracts, routes, configs).
-  - [ ] Implementasikan Tabel CRUD untuk setiap koleksi.
-  - [ ] Buat formulir untuk menambah/engedit data.
+  - [x] Hubungkan ke koleksi Firestore (resources, contracts, routes, configs).
+  - [x] Implementasikan Tabel CRUD untuk setiap koleksi.
+  - [x] Buat formulir untuk menambah/mengedit data.
 
 - [x] **Pengontrol Konektor (100%)**
   - [x] Buat halaman Pengontrol Konektor.
@@ -55,15 +55,15 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Tampilkan tabel dari koleksi yang sesuai untuk setiap modul (resources, policies, messages, users).
   - [x] Hubungkan ke data Firestore langsung.
 
-- [ ] **Routing & Services (5%)**
+- [x] **Routing & Services (100%)**
   - [x] Buat halaman placeholder Routing & Services.
-  - [ ] Implementasikan Tabel & Formulir CRUD untuk Rute Camel (koleksi "routes").
-  - [ ] Implementasikan Tabel & Formulir CRUD untuk Aplikasi Layanan (koleksi "services").
+  - [x] Implementasikan Tabel & Formulir CRUD untuk Rute Camel (koleksi "routes").
+  - [x] Implementasikan Tabel & Formulir CRUD untuk Aplikasi Layanan (koleksi "service-applications").
 
-- [ ] **Sistem Backend (5%)**
+- [x] **Sistem Backend (100%)**
   - [x] Buat halaman placeholder Sistem Backend.
-  - [ ] Tampilkan kartu status API dari koleksi "apis".
-  - [ ] Tampilkan tabel log pemrosesan dari koleksi "processing_logs".
+  - [x] Tampilkan kartu status API dari koleksi "apis".
+  - [x] Tampilkan tabel log pemrosesan dari koleksi "processing_logs".
 
 - [x] **Layanan IDS Eksternal (100%)**
   - [x] Buat halaman placeholder Layanan Eksternal.

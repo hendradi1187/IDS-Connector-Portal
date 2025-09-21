@@ -16,18 +16,18 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
-function PlaceholderTab({ title }: { title: string }) {
+function PlaceholderTab({ title, description, content }: { title: string, description: string, content: string }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>
-          Kelola {title.toLowerCase()} untuk konektor Anda.
+          {description}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20">
-          <p className="text-muted-foreground">{title} UI Manajemen</p>
+          <p className="text-muted-foreground">{content}</p>
         </div>
       </CardContent>
     </Card>
@@ -77,13 +77,21 @@ export default function GuiPage() {
               <NetworkSettings />
             </TabsContent>
             <TabsContent value="container-management">
-              <PlaceholderTab title="Manajemen Kontainer" />
+              <PlaceholderTab 
+                title="Manajemen Kontainer" 
+                description="Kelola, monitor, dan operasikan kontainer tempat konektor berjalan."
+                content="UI untuk Start/Stop/Restart, dan memonitor CPU, Memori, dan Log."
+              />
             </TabsContent>
             <TabsContent value="configure-connector">
               <ConfigManagement />
             </TabsContent>
             <TabsContent value="data-sources">
-              <PlaceholderTab title="Kelola Sumber Data" />
+              <PlaceholderTab 
+                title="Kelola Sumber Data"
+                description="Kelola sumber data eksternal yang terhubung dengan konektor."
+                content="UI Manajemen Sumber Data"
+               />
             </TabsContent>
           </Tabs>
         </div>

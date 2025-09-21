@@ -8,11 +8,11 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
 
 ### Modul & Fitur
 
-- [x] **Konfigurasi Proyek & Otentikasi (100%)**
+- [ ] **Konfigurasi Proyek & Otentikasi (35%)**
   - [x] Inisialisasi proyek Next.js.
   - [x] Konfigurasi Firebase (Hosting, Firestore, Authentication).
-  - [x] Implementasi alur login dengan Email & Password.
-  - [x] Manajemen peran pengguna (admin, operator, viewer).
+  - [ ] Implementasi alur login dengan Email & Password.
+  - [ ] Manajemen peran pengguna (admin, operator, viewer).
 
 - [x] **Tata Letak Utama (100%)**
   - [x] Buat desain dashboard desktop.
@@ -33,17 +33,17 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Hubungkan ke koleksi "users" di Firestore.
   - [x] Buat fungsionalitas CRUD (Create, Read, Update, Delete) untuk pengguna.
 
-- [x] **GUI (80%)**
+- [x] **GUI (95%)**
   - [x] Buat halaman GUI dengan struktur tab yang benar.
-  - [x] Hubungkan tab "Kelola Sumber Daya" ke koleksi `resources` Firestore.
-  - [x] Implementasikan Formulir & Tabel untuk setiap tab.
-  - [ ] Hubungkan setiap tab ke koleksi Firestore yang sesuai.
+  - [x] Implementasikan Formulir & Tabel untuk setiap tab (Resources, Routes, Brokers, Network, Configs, Data Requests).
+  - [x] Hubungkan setiap tab ke koleksi Firestore yang sesuai.
+  - [ ] Implementasikan fungsionalitas "Container Management" dan "Data Sources".
 
 - [x] **Manajemen Data (100%)**
   - [x] Buat halaman placeholder Manajemen Data.
   - [x] Hubungkan ke koleksi Firestore (resources, contracts, routes, configs).
   - [x] Implementasikan Tabel CRUD untuk setiap koleksi.
-  - [x] Buat formulir untuk menambah/engedit data.
+  - [x] Buat formulir untuk menambah/mengedit data.
 
 - [x] **Pengontrol Konektor (100%)**
   - [x] Buat halaman Pengontrol Konektor.
@@ -58,7 +58,7 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
 - [x] **Routing & Services (100%)**
   - [x] Buat halaman placeholder Routing & Services.
   - [x] Implementasikan Tabel & Formulir CRUD untuk Rute Camel (koleksi "routes").
-  - [x] Implementasikan Tabel & Formulir CRUD untuk Aplikasi Layanan (koleksi "services").
+  - [x] Implementasikan Tabel & Formulir CRUD untuk Aplikasi Layanan (koleksi "service-applications").
 
 - [x] **Sistem Backend (100%)**
   - [x] Buat halaman placeholder Sistem Backend.
@@ -69,4 +69,3 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Buat halaman placeholder Layanan Eksternal.
   - [x] Implementasikan daftar tautan statis.
   - [x] Hubungkan status layanan ke data Firestore.
-
