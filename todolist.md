@@ -2,7 +2,7 @@
 
 Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Portal".
 
-**Kemajuan Keseluruhan: 29%**
+**Kemajuan Keseluruhan: 38%**
 
 ---
 
@@ -14,11 +14,11 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [ ] Implementasi alur login dengan Email & Password.
   - [ ] Manajemen peran pengguna (admin, operator, viewer).
 
-- [ ] **Tata Letak Utama (90%)**
+- [x] **Tata Letak Utama (100%)**
   - [x] Buat desain dashboard desktop.
   - [x] Implementasi Sidebar di sebelah kiri.
   - [x] Tambahkan menu navigasi ke Sidebar.
-  - [ ] Pastikan perutean berfungsi untuk semua item menu.
+  - [x] Pastikan perutean berfungsi untuk semua item menu.
 
 - [ ] **Dashboard (40%)**
   - [x] Tiga kartu ringkasan (Konektor Aktif, Rute Data, Kesalahan).
@@ -26,12 +26,12 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Tabel untuk 10 log aktivitas terbaru (data dummy).
   - [ ] Hubungkan komponen ke data Firestore langsung.
 
-- [ ] **Manajemen Pengguna (75%)**
+- [x] **Manajemen Pengguna (100%)**
   - [x] Buat halaman Manajemen Pengguna dengan tab filter peran.
   - [x] Tampilkan tabel pengguna dengan data dummy.
   - [x] Hubungkan ke koleksi "users" di Firestore.
   - [x] Buat fungsionalitas CRUD (Create, Read, Update, Delete) untuk pengguna.
-  - [ ] Buat fungsionalitas CRUD (Update, Delete) untuk pengguna.
+  - [x] Buat fungsionalitas CRUD (Update, Delete) untuk pengguna.
 
 - [ ] **GUI (20%)**
   - [x] Buat halaman GUI dengan struktur tab yang benar.
