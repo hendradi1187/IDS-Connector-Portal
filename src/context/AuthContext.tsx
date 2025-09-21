@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -29,8 +29,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (userDoc.exists()) {
           setUser({ id: userDoc.id, ...userDoc.data() } as User);
         } else {
-          // Handle case where user exists in Auth but not Firestore
-          setUser(null);
+          // If user exists in Auth but not in Firestore, create a new Firestore document for them.
+          const newUser: Omit<User, 'id'> = {
+            name: firebaseUser.displayName || firebaseUser.email || 'New User',
+            email: firebaseUser.email!,
+            role: 'Viewer', // Default role for new users
+            avatar: firebaseUser.photoURL || `https://picsum.photos/seed/${firebaseUser.uid}/32/32`
+          };
+          await setDoc(userDocRef, newUser);
+          setUser({ id: firebaseUser.uid, ...newUser });
         }
       } else {
         // User is signed out
