@@ -100,3 +100,11 @@ export type ProcessingLog = {
   message: string;
   level: 'Info' | 'Warning' | 'Error';
 };
+
+export type Broker = {
+  id: string;
+  name: string;
+  url: string;
+  status: 'Registered' | 'Unregistered';
+  created: string;
+};

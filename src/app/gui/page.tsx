@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ResourceManagement from '@/components/configuration/ResourceManagement';
 import RouteManagement from '@/components/routes/RouteManagement';
 import ConfigManagement from '@/components/configs/ConfigManagement';
+import BrokerManagement from '@/components/brokers/BrokerManagement';
 
 function PlaceholderTab({ title }: { title: string }) {
   return (
@@ -77,7 +78,7 @@ export default function GuiPage() {
               <PlaceholderTab title="Kelola Sumber Data" />
             </TabsContent>
             <TabsContent value="broker-management">
-              <PlaceholderTab title="Kelola Broker" />
+              <BrokerManagement />
             </TabsContent>
           </Tabs>
         </div>
