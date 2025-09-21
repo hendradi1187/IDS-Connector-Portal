@@ -49,3 +49,9 @@ Ini adalah daftar tugas yang disesuaikan untuk pengembangan "IDS Connector Porta
 - [x] **Sistem & Layanan (100%)**
   - [x] **Routing & Services**: Kelola rute data (Camel routes) dan aplikasi layanan internal.
   - [x] **Sistem Backend**: Lihat status API dan log pemrosesan dari sistem backend.
+
+---
+
+### Catatan Tambahan
+
+*   Fitur lain yang Anda sebutkan (seperti filter tabel, dark mode, dan pencarian lanjutan) adalah penyempurnaan yang sangat baik, tetapi memerlukan implementasi yang lebih kompleks.
