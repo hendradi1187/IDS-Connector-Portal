@@ -1,4 +1,4 @@
-import { User, ActivityLog, ChartData, Connector, Module, ExternalService, Resource } from '@/lib/types';
+import { User, ActivityLog, ChartData, Module, ExternalService, Resource } from '@/lib/types';
 
 export const mockUsers: User[] = [
   { id: '1', name: 'Admin User', email: 'admin@example.com', role: 'Admin', avatar: '/avatars/01.png' },
@@ -59,13 +59,6 @@ export const mockChartData: ChartData[] = [
   { time: '16:00', requests: 110, responses: 105 },
   { time: '17:00', requests: 124, responses: 118 },
   { time: '18:00', requests: 98, responses: 95 },
-];
-
-export const mockConnectors: Connector[] = [
-  { name: 'Route Handler', status: 'active' },
-  { name: 'REST Controller', status: 'active' },
-  { name: 'Database Handler', status: 'active' },
-  { name: 'Configuration Manager', status: 'inactive' },
 ];
 
 export const mockModules: Module[] = [

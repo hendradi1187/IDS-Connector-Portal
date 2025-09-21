@@ -2,15 +2,15 @@
 
 Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Portal".
 
-**Kemajuan Keseluruhan: 18%**
+**Kemajuan Keseluruhan: 19%**
 
 ---
 
 ### Modul & Fitur
 
-- [ ] **Konfigurasi Proyek & Otentikasi (10%)**
+- [ ] **Konfigurasi Proyek & Otentikasi (25%)**
   - [x] Inisialisasi proyek Next.js.
-  - [ ] Konfigurasi Firebase (Hosting, Firestore, Authentication).
+  - [x] Konfigurasi Firebase (Hosting, Firestore, Authentication).
   - [ ] Implementasi alur login dengan Email & Password.
   - [ ] Manajemen peran pengguna (admin, operator, viewer).
 
@@ -44,10 +44,10 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [ ] Implementasikan Tabel CRUD untuk setiap koleksi.
   - [ ] Buat formulir untuk menambah/mengedit data.
 
-- [x] **Pengontrol Konektor (60%)**
+- [x] **Pengontrol Konektor (100%)**
   - [x] Buat halaman Pengontrol Konektor.
   - [x] Tampilkan status untuk 4 komponen (data dummy).
-  - [ ] Hubungkan status ke koleksi "controllers" di Firestore.
+  - [x] Hubungkan status ke koleksi "controllers" di Firestore.
 
 - [ ] **Konektor Dataspace (20%)**
   - [x] Buat halaman Konektor Dataspace dengan daftar modul.

@@ -19,6 +19,7 @@ export type ActivityLog = {
 };
 
 export type Connector = {
+  id: string;
   name: string;
   status: 'active' | 'inactive';
 };
