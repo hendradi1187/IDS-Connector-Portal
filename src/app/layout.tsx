@@ -3,16 +3,9 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarInset,
-  SidebarRail,
-} from '@/components/ui/sidebar';
-import Header from '@/components/layout/Header';
-import SidebarNav from '@/components/layout/SidebarNav';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 import AuthGuard from '@/components/layout/AuthGuard';
+import AppLayout from '@/components/layout/AppLayout';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -24,26 +17,6 @@ export const metadata: Metadata = {
   description: 'Manage your International Data Spaces connectors with ease.',
 };
 
-function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
-
-  if (!user) {
-    return <>{children}</>;
-  }
-
-  return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarNav />
-        <SidebarRail />
-      </Sidebar>
-      <SidebarInset>
-        <Header />
-        <main className="p-4 lg:p-6">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
-  );
-}
 
 export default function RootLayout({
   children,
