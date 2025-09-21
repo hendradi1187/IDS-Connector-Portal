@@ -19,9 +19,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
-import { mockUsers } from '@/lib/data';
 import { User } from '@/lib/types';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Skeleton } from '../ui/skeleton';
 
 type UserTableProps = {
   role: 'all' | User['role'];
@@ -34,12 +36,53 @@ const roleVariants = {
 };
 
 export default function UserTable({ role }: UserTableProps) {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
+      const usersData: User[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        usersData.push({
+          id: doc.id,
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          avatar: data.avatar,
+        });
+      });
+      setUsers(usersData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const filteredUsers = useMemo(() => {
     if (role === 'all') {
-      return mockUsers;
+      return users;
     }
-    return mockUsers.filter((user) => user.role === role);
-  }, [role]);
+    return users.filter((user) => user.role === role);
+  }, [role, users]);
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="flex items-center gap-4 p-4">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-2/4" />
+            </div>
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-8 w-8" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <Table>
