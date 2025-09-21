@@ -76,3 +76,12 @@ export type Config = {
   description: string;
   created: string;
 };
+
+export type ServiceApplication = {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  status: 'Active' | 'Inactive';
+  created: string;
+};

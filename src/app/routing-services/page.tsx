@@ -7,23 +7,7 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RouteManagement from '@/components/routes/RouteManagement';
-
-function PlaceholderTab({ title, description }: { title: string, description: string }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20">
-          <p className="text-muted-foreground">{title} UI</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
+import ServiceApplicationManagement from '@/components/service-applications/ServiceApplicationManagement';
 
 export default function RoutingServicesPage() {
   return (
@@ -45,10 +29,7 @@ export default function RoutingServicesPage() {
               <RouteManagement />
             </TabsContent>
             <TabsContent value="service-applications">
-                <PlaceholderTab 
-                    title="Service Applications" 
-                    description="Manage service applications registered with the connector."
-                />
+              <ServiceApplicationManagement />
             </TabsContent>
           </Tabs>
         </div>
