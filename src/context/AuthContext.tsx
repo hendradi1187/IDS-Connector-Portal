@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -17,8 +17,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = React.useState<User | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
@@ -34,7 +34,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             name: firebaseUser.displayName || firebaseUser.email || 'New User',
             email: firebaseUser.email!,
             role: 'Viewer', // Default role for new users
-            avatar: firebaseUser.photoURL || `https://picsum.photos/seed/${firebaseUser.uid}/32/32`
+            avatar: firebaseUser.photoURL || `https://picsum.photos/seed/${firebaseUser.uid}/32/32`,
+            organization: 'Unknown',
+            createdAt: new Date().toISOString(),
           };
           await setDoc(userDocRef, newUser);
           setUser({ id: firebaseUser.uid, ...newUser });
