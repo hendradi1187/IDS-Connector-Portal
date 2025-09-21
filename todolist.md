@@ -2,7 +2,7 @@
 
 Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Portal".
 
-**Kemajuan Keseluruhan: 52%**
+**Kemajuan Keseluruhan: 60%**
 
 ---
 
@@ -20,12 +20,12 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Tambahkan menu navigasi ke Sidebar.
   - [x] Pastikan perutean berfungsi untuk semua item menu.
 
-- [ ] **Dashboard (70%)**
+- [x] **Dashboard (100%)**
   - [x] Tiga kartu ringkasan (Konektor Aktif, Rute Data, Kesalahan).
   - [x] Grafik garis untuk lalu lintas data (data dummy).
   - [x] Tabel untuk 10 log aktivitas terbaru (data dummy).
   - [x] Hubungkan komponen log aktivitas ke data Firestore langsung.
-  - [ ] Hubungkan kartu ringkasan & grafik ke data Firestore.
+  - [x] Hubungkan kartu ringkasan & grafik ke data Firestore.
 
 - [x] **Manajemen Pengguna (100%)**
   - [x] Buat halaman Manajemen Pengguna dengan tab filter peran.
