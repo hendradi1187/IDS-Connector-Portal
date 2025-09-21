@@ -1,6 +1,6 @@
 'use client';
 
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 import {
   Card,
@@ -34,11 +34,11 @@ export default function DataTrafficChart() {
     <Card>
       <CardHeader>
         <CardTitle>Data Traffic</CardTitle>
-        <CardDescription>Recent Requests vs. Responses</CardDescription>
+        <CardDescription>Recent Requests vs. Responses per hour.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
-          <BarChart data={mockChartData} accessibilityLayer>
+          <LineChart data={mockChartData} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -50,9 +50,9 @@ export default function DataTrafficChart() {
             <YAxis />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="requests" fill="var(--color-requests)" radius={4} />
-            <Bar dataKey="responses" fill="var(--color-responses)" radius={4} />
-          </BarChart>
+            <Line type="monotone" dataKey="requests" stroke="var(--color-requests)" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="responses" stroke="var(--color-responses)" strokeWidth={2} dot={false} />
+          </LineChart>
         </ChartContainer>
       </CardContent>
     </Card>

@@ -15,6 +15,12 @@ import {
   Shield,
   LifeBuoy,
   Power,
+  Database,
+  Waypoints,
+  Server,
+  Network,
+  Plug,
+  Boxes,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -23,7 +29,13 @@ import { Button } from '../ui/button';
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/users', icon: Users, label: 'User Management' },
-  { href: '/configuration', icon: Settings, label: 'Configuration' },
+  { href: '/gui', icon: Settings, label: 'GUI' },
+  { href: '/data-management', icon: Database, label: 'Data Management' },
+  { href: '/connector-controller', icon: Plug, label: 'Connector Controller' },
+  { href: '/dataspace-connector', icon: Boxes, label: 'Dataspace Connector' },
+  { href: '/routing-services', icon: Waypoints, label: 'Routing & Services' },
+  { href: '/backend-system', icon: Server, label: 'Backend System' },
+  { href: '/external-services', icon: Network, label: 'External IDS Services' },
 ];
 
 export default function SidebarNav() {

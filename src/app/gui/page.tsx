@@ -26,7 +26,7 @@ function PlaceholderTab({ title }: { title: string }) {
   );
 }
 
-export default function ConfigurationPage() {
+export default function GuiPage() {
   const tabs = [
     { value: 'request-data', label: 'Request Data' },
     { value: 'connector-config', label: 'Connector' },
@@ -41,7 +41,7 @@ export default function ConfigurationPage() {
     <div className="flex min-h-screen w-full flex-col">
       <main className="flex flex-1 flex-col gap-4">
         <div className="grid gap-4">
-          <h1 className="font-semibold text-3xl">Configuration</h1>
+          <h1 className="font-semibold text-3xl">GUI</h1>
           <Tabs defaultValue="resource-management" className="grid gap-4">
             <div className="overflow-x-auto">
               <TabsList>
