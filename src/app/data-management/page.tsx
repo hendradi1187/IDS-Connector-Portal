@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ResourceManagement from '@/components/configuration/ResourceManagement';
+import ContractManagement from '@/components/contracts/ContractManagement';
 
 function PlaceholderTab({ title }: { title: string }) {
   return (
@@ -52,15 +53,18 @@ export default function DataManagementPage() {
                 ))}
               </TabsList>
             </div>
-            {tabs.map((tab) => (
-              <TabsContent key={tab.value} value={tab.value}>
-                {tab.value === 'resources' ? (
-                  <ResourceManagement />
-                ) : (
-                  <PlaceholderTab title={tab.label} />
-                )}
-              </TabsContent>
-            ))}
+            <TabsContent value="resources">
+              <ResourceManagement />
+            </TabsContent>
+            <TabsContent value="contracts">
+              <ContractManagement />
+            </TabsContent>
+            <TabsContent value="routes">
+              <PlaceholderTab title="Routes" />
+            </TabsContent>
+            <TabsContent value="configs">
+              <PlaceholderTab title="Configs" />
+            </TabsContent>
           </Tabs>
         </div>
       </main>

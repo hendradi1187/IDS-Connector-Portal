@@ -52,3 +52,11 @@ export type Resource = {
   created: string;
   status: 'Available' | 'Deprecated';
 };
+
+export type Contract = {
+  id: string;
+  name: string;
+  provider: string;
+  created: string;
+  status: 'Active' | 'Expired';
+};
