@@ -1,22 +1,90 @@
+
 export type User = {
-  id: string;
-  name: string;
+  id: string; // userId from Firebase Auth UID
   email: string;
-  role: 'Admin' | 'Operator' | 'Viewer';
-  avatar: string;
+  role: 'KKKS-Provider' | 'SKK-Consumer' | 'Admin';
+  organization: string;
+  createdAt: string;
+  avatar: string; // Keep avatar for UI
+};
+
+export type DataRequest = {
+  id: string; // requestId
+  requesterId: string; // userId SKK Migas
+  providerId: string; // userId KKKS
+  resourceId: string;
+  requestType: 'GeoJSON' | 'Seismic' | 'Production';
+  status: 'pending' | 'approved' | 'rejected' | 'delivered';
+  purpose: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Resource = {
+  id: string; // resourceId
+  providerId: string;
+  name: string;
+  description: string;
+  type: 'GeoJSON' | 'CSV' | 'Well Data';
+  storagePath: string; // link Firebase Storage
+  metadata: {
+    lokasi: { latitude: number; longitude: number };
+    luas_area: number;
+    periode: string;
+  };
+  accessPolicy: 'restricted' | 'public' | 'contract-only';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Route = {
+  id: string; // routeId
+  providerId: string;
+  consumerId: string;
+  resourceId: string;
+  status: 'active' | 'inactive';
+  validUntil: string; // timestamp
+  createdAt: string;
+};
+
+export type Broker = {
+  id: string; // brokerId
+  transactionId: string;
+  requestId: string;
+  validationStatus: 'pending' | 'approved' | 'rejected';
+  notes: string;
+  timestamp: string;
+};
+
+export type NetworkSetting = {
+  id: string; // settingId
+  providerId: string;
+  apiEndpoint: string;
+  protocol: 'HTTPS' | 'VPN' | 'IDS Broker';
+  status: 'active' | 'inactive';
+  lastChecked: string; // timestamp
+};
+
+export type Container = {
+  id: string; // containerId
+  serviceName: 'GeoJSON Parser' | 'Request Handler';
+  providerId: string;
+  status: 'running' | 'stopped' | 'error';
+  lastRestarted: string; // timestamp
+  logs: string[];
 };
 
 export type ActivityLog = {
-  id: string;
-  user: {
-    name: string;
-    avatar: string;
-  };
-  action: string;
-  details: string;
-  status: 'Success' | 'Failed' | 'In Progress';
+  id: string; // logId implicit
+  action: 'upload_resource' | 'request_data' | 'approve_request';
+  userId: string;
+  details: Record<string, any>;
   timestamp: string;
 };
+
+
+// The following types are kept for existing component compatibility but should be deprecated/removed.
+// They are based on the old data structure.
 
 export type Connector = {
   id: string;
@@ -45,29 +113,12 @@ export type ExternalService = {
   url: string;
 };
 
-export type Resource = {
-  id: string;
-  name: string;
-  type: 'Peta GeoJSON' | 'Data Sumur (Well Log)' | 'Data Produksi' | 'Lainnya';
-  description?: string;
-  created: string;
-  status: 'Tersedia' | 'Tidak Digunakan';
-};
-
 export type Contract = {
   id: string;
   name: string;
   provider: string;
   created: string;
   status: 'Aktif' | 'Kadaluarsa';
-};
-
-export type Route = {
-  id: string;
-  name: string;
-  endpoint: string;
-  created: string;
-  status: 'Active' | 'Inactive';
 };
 
 export type Config = {
@@ -100,23 +151,4 @@ export type ProcessingLog = {
   service: string;
   message: string;
   level: 'Info' | 'Warning' | 'Error';
-};
-
-export type Broker = {
-  id: string;
-  name: string;
-  url: string;
-  status: 'Registered' | 'Unregistered';
-  created: string;
-};
-
-export type DataRequest = {
-  id: string;
-  resourceId: string;
-  resourceName: string;
-  contractId: string;
-  contractName: string;
-  destination: string;
-  status: 'Tertunda' | 'Disetujui' | 'Terkirim' | 'Ditolak';
-  created: string;
 };
