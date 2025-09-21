@@ -8,11 +8,11 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
 
 ### Modul & Fitur
 
-- [ ] **Konfigurasi Proyek & Otentikasi (35%)**
+- [x] **Konfigurasi Proyek & Otentikasi (100%)**
   - [x] Inisialisasi proyek Next.js.
   - [x] Konfigurasi Firebase (Hosting, Firestore, Authentication).
-  - [ ] Implementasi alur login dengan Email & Password.
-  - [ ] Manajemen peran pengguna (admin, operator, viewer).
+  - [x] Implementasi alur login dengan Email & Password.
+  - [x] Manajemen peran pengguna (admin, operator, viewer).
 
 - [x] **Tata Letak Utama (100%)**
   - [x] Buat desain dashboard desktop.
