@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/sidebar';
 import Header from '@/components/layout/Header';
 import SidebarNav from '@/components/layout/SidebarNav';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import AuthGuard from '@/components/layout/AuthGuard';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,6 +23,27 @@ export const metadata: Metadata = {
   title: 'IDS Connector Portal',
   description: 'Manage your International Data Spaces connectors with ease.',
 };
+
+function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <>{children}</>;
+  }
+
+  return (
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarNav />
+        <SidebarRail />
+      </Sidebar>
+      <SidebarInset>
+        <Header />
+        <main className="p-4 lg:p-6">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -38,16 +61,13 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased', inter.variable)}>
-        <SidebarProvider>
-          <Sidebar>
-            <SidebarNav />
-            <SidebarRail />
-          </Sidebar>
-          <SidebarInset>
-            <Header />
-            <main className="p-4 lg:p-6">{children}</main>
-          </SidebarInset>
-        </SidebarProvider>
+        <AuthProvider>
+          <AuthGuard>
+            <AppLayout>
+              {children}
+            </AppLayout>
+          </AuthGuard>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

@@ -30,10 +30,16 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Header() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const pathSegments = pathname.split('/').filter(Boolean);
+
+  const handleLogout = async () => {
+    await logout();
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -86,7 +92,7 @@ export default function Header() {
             className="overflow-hidden rounded-full"
           >
             <Image
-              src="https://picsum.photos/seed/1/36/36"
+              src={user?.avatar ?? "https://picsum.photos/seed/1/36/36"}
               width={36}
               height={36}
               alt="Avatar"
@@ -96,7 +102,7 @@ export default function Header() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
@@ -107,7 +113,7 @@ export default function Header() {
             Settings
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </DropdownMenuItem>
