@@ -7,6 +7,8 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ResourceManagement from '@/components/configuration/ResourceManagement';
+import RouteManagement from '@/components/routes/RouteManagement';
+import ConfigManagement from '@/components/configs/ConfigManagement';
 
 function PlaceholderTab({ title }: { title: string }) {
   return (
@@ -53,15 +55,30 @@ export default function GuiPage() {
                 ))}
               </TabsList>
             </div>
-            {tabs.map((tab) => (
-              <TabsContent key={tab.value} value={tab.value}>
-                {tab.value === 'resource-management' ? (
-                  <ResourceManagement />
-                ) : (
-                  <PlaceholderTab title={tab.label} />
-                )}
-              </TabsContent>
-            ))}
+            <TabsContent value="request-data">
+              <PlaceholderTab title="Minta Data" />
+            </TabsContent>
+            <TabsContent value="app-routes">
+              <RouteManagement />
+            </TabsContent>
+            <TabsContent value="network-settings">
+              <PlaceholderTab title="Pengaturan Jaringan" />
+            </TabsContent>
+            <TabsContent value="container-management">
+              <PlaceholderTab title="Manajemen Kontainer" />
+            </TabsContent>
+            <TabsContent value="configure-connector">
+              <ConfigManagement />
+            </TabsContent>
+            <TabsContent value="resource-management">
+              <ResourceManagement />
+            </TabsContent>
+            <TabsContent value="data-sources">
+              <PlaceholderTab title="Kelola Sumber Data" />
+            </TabsContent>
+            <TabsContent value="broker-management">
+              <PlaceholderTab title="Kelola Broker" />
+            </TabsContent>
           </Tabs>
         </div>
       </main>

@@ -69,3 +69,4 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Buat halaman placeholder Layanan Eksternal.
   - [x] Implementasikan daftar tautan statis.
   - [x] Hubungkan status layanan ke data Firestore.
+
