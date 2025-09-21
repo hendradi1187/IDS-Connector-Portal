@@ -26,18 +26,19 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !user && pathname !== '/login') {
+    if (loading) return;
+
+    if (!user && pathname !== '/login') {
       router.push('/login');
+    }
+
+    if (user && pathname === '/login') {
+     router.push('/');
     }
   }, [user, loading, router, pathname]);
 
-  if (loading || (!user && pathname !== '/login')) {
+  if (loading || (!user && pathname !== '/login') || (user && pathname === '/login')) {
     return <FullPageLoader />;
-  }
-
-  if (user && pathname === '/login') {
-     router.push('/');
-     return <FullPageLoader />;
   }
 
   return <>{children}</>;
