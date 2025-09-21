@@ -14,7 +14,6 @@ import {
   Settings,
   Shield,
   LifeBuoy,
-  Power,
   Database,
   Waypoints,
   Server,
@@ -24,8 +23,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from '../ui/button';
-import { useAuth } from '@/context/AuthContext';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -41,11 +38,6 @@ const navItems = [
 
 export default function SidebarNav() {
   const pathname = usePathname();
-  const { logout } = useAuth();
-
-  const handleLogout = async () => {
-    await logout();
-  }
 
   return (
     <>
@@ -88,12 +80,6 @@ export default function SidebarNav() {
               <LifeBuoy />
               <span>Support</span>
             </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Button variant="ghost" className="w-full justify-start gap-2 px-2" onClick={handleLogout}>
-              <Power />
-              <span>Logout</span>
-            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
