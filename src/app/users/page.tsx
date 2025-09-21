@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AddUserDialog from '@/components/users/AddUserDialog';
 
 export default function UsersPage() {
   return (
@@ -24,12 +25,7 @@ export default function UsersPage() {
           <Button size="sm" variant="outline">
             Export
           </Button>
-          <Button size="sm" className="h-8 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add User
-            </span>
-          </Button>
+          <AddUserDialog />
         </div>
       </div>
       <TabsContent value="all">

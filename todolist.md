@@ -2,7 +2,7 @@
 
 Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Portal".
 
-**Kemajuan Keseluruhan: 22%**
+**Kemajuan Keseluruhan: 29%**
 
 ---
 
@@ -26,11 +26,12 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Tabel untuk 10 log aktivitas terbaru (data dummy).
   - [ ] Hubungkan komponen ke data Firestore langsung.
 
-- [ ] **Manajemen Pengguna (50%)**
+- [ ] **Manajemen Pengguna (75%)**
   - [x] Buat halaman Manajemen Pengguna dengan tab filter peran.
   - [x] Tampilkan tabel pengguna dengan data dummy.
   - [x] Hubungkan ke koleksi "users" di Firestore.
-  - [ ] Buat fungsionalitas CRUD (Create, Read, Update, Delete) untuk pengguna.
+  - [x] Buat fungsionalitas CRUD (Create, Read, Update, Delete) untuk pengguna.
+  - [ ] Buat fungsionalitas CRUD (Update, Delete) untuk pengguna.
 
 - [ ] **GUI (20%)**
   - [x] Buat halaman GUI dengan struktur tab yang benar.
