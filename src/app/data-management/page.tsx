@@ -9,24 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ResourceManagement from '@/components/configuration/ResourceManagement';
 import ContractManagement from '@/components/contracts/ContractManagement';
 import RouteManagement from '@/components/routes/RouteManagement';
-
-function PlaceholderTab({ title }: { title: string }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>
-          Manage {title.toLowerCase()} for your connector.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20">
-          <p className="text-muted-foreground">{title} Management UI</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+import ConfigManagement from '@/components/configs/ConfigManagement';
 
 export default function DataManagementPage() {
   const tabs = [
@@ -64,7 +47,7 @@ export default function DataManagementPage() {
               <RouteManagement />
             </TabsContent>
             <TabsContent value="configs">
-              <PlaceholderTab title="Configs" />
+              <ConfigManagement />
             </TabsContent>
           </Tabs>
         </div>

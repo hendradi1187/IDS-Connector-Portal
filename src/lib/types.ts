@@ -68,3 +68,11 @@ export type Route = {
   created: string;
   status: 'Active' | 'Inactive';
 };
+
+export type Config = {
+  id: string;
+  key: string;
+  value: string;
+  description: string;
+  created: string;
+};
