@@ -35,6 +35,7 @@ export type Module = {
   name: string;
   description: string;
   items: number;
+  collectionName?: string;
 };
 
 export type ExternalService = {
