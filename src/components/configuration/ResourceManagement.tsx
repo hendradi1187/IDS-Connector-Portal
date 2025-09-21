@@ -16,7 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,12 +24,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { Resource } from '@/lib/types';
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Skeleton } from '../ui/skeleton';
+import { Button } from '../ui/button';
+import AddResourceDialog from './AddResourceDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { deleteResource } from '@/app/resources/actions';
+import EditResourceDialog from './EditResourceDialog';
 
 const statusVariants: { [key in Resource['status']]: 'default' | 'destructive' } = {
   Available: 'default',
@@ -40,9 +55,11 @@ const statusVariants: { [key in Resource['status']]: 'default' | 'destructive' }
 export default function ResourceManagement() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'resources'), (snapshot) => {
+    const q = query(collection(db, 'resources'), orderBy('created', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const resourcesData: Resource[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -61,6 +78,22 @@ export default function ResourceManagement() {
     return () => unsubscribe();
   }, []);
 
+  const handleDelete = async (resource: Resource) => {
+    try {
+      await deleteResource(resource.id);
+      toast({
+        title: 'Resource Deleted',
+        description: `Resource "${resource.name}" has been successfully deleted.`,
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to delete resource. Please try again.',
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -71,10 +104,7 @@ export default function ResourceManagement() {
               Facilitates CRUD operations for resources, contracts, and routes.
             </CardDescription>
           </div>
-          <Button size="sm" className="gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span>Add Resource</span>
-          </Button>
+          <AddResourceDialog />
         </div>
       </CardHeader>
       <CardContent>
@@ -94,10 +124,19 @@ export default function ResourceManagement() {
             {loading ? (
               [...Array(4)].map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell colSpan={4}>
-                    <Skeleton className="h-5 w-full" />
+                  <TableCell>
+                    <Skeleton className="h-5 w-3/4" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-1/2" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-20" />
                   </TableCell>
                    <TableCell>
+                    <Skeleton className="h-5 w-24" />
+                  </TableCell>
+                  <TableCell>
                     <Skeleton className="h-8 w-8 ml-auto" />
                   </TableCell>
                 </TableRow>
@@ -112,7 +151,7 @@ export default function ResourceManagement() {
                       {resource.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{resource.created}</TableCell>
+                  <TableCell>{new Date(resource.created).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end">
                       <DropdownMenu>
@@ -124,12 +163,36 @@ export default function ResourceManagement() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <EditResourceDialog resource={resource}>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                              Edit
+                            </DropdownMenuItem>
+                          </EditResourceDialog>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
-                            Delete
-                          </DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete the resource "{resource.name}".
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(resource)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
