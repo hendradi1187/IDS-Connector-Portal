@@ -48,9 +48,10 @@ export type ExternalService = {
 export type Resource = {
   id: string;
   name: string;
-  type: string;
+  type: 'Peta GeoJSON' | 'Data Sumur (Well Log)' | 'Data Produksi' | 'Lainnya';
+  description?: string;
   created: string;
-  status: 'Available' | 'Deprecated';
+  status: 'Tersedia' | 'Tidak Digunakan';
 };
 
 export type Contract = {
@@ -58,7 +59,7 @@ export type Contract = {
   name: string;
   provider: string;
   created: string;
-  status: 'Active' | 'Expired';
+  status: 'Aktif' | 'Kadaluarsa';
 };
 
 export type Route = {
@@ -116,6 +117,6 @@ export type DataRequest = {
   contractId: string;
   contractName: string;
   destination: string;
-  status: 'Pending' | 'Approved' | 'Delivered' | 'Rejected';
+  status: 'Tertunda' | 'Disetujui' | 'Terkirim' | 'Ditolak';
   created: string;
 };

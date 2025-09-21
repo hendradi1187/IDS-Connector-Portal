@@ -48,8 +48,8 @@ import { deleteContract } from '@/app/contracts/actions';
 import EditContractDialog from './EditContractDialog';
 
 const statusVariants: { [key in Contract['status']]: 'default' | 'destructive' } = {
-  Active: 'default',
-  Expired: 'destructive',
+  Aktif: 'default',
+  Kadaluarsa: 'destructive',
 };
 
 export default function ContractManagement() {
@@ -82,14 +82,14 @@ export default function ContractManagement() {
     try {
       await deleteContract(contract.id);
       toast({
-        title: 'Contract Deleted',
-        description: `Contract "${contract.name}" has been successfully deleted.`,
+        title: 'Kontrak Dihapus',
+        description: `Kontrak "${contract.name}" telah berhasil dihapus.`,
       });
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to delete contract. Please try again.',
+        description: 'Gagal menghapus kontrak. Silakan coba lagi.',
       });
     }
   };
@@ -99,9 +99,9 @@ export default function ContractManagement() {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle>Contract Management</CardTitle>
+            <CardTitle>Manajemen Kontrak Penggunaan</CardTitle>
             <CardDescription>
-              Browse, add, and manage data usage contracts.
+              Kelola kontrak penggunaan data yang mengatur siapa dapat mengakses apa.
             </CardDescription>
           </div>
           <AddContractDialog />
@@ -111,12 +111,12 @@ export default function ContractManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Provider</TableHead>
+              <TableHead>Nama Kontrak</TableHead>
+              <TableHead>KKKS (Provider)</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
+              <TableHead>Tanggal Dibuat</TableHead>
               <TableHead>
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">Aksi</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -162,7 +162,7 @@ export default function ContractManagement() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                           <EditContractDialog contract={contract}>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                               Edit
@@ -175,20 +175,20 @@ export default function ContractManagement() {
                                 className="text-destructive"
                                 onSelect={(e) => e.preventDefault()}
                               >
-                                Delete
+                                Hapus
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the contract "{contract.name}".
+                                  Aksi ini tidak dapat dibatalkan. Ini akan menghapus kontrak secara permanen "{contract.name}".
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>Batal</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => handleDelete(contract)}>
-                                  Delete
+                                  Hapus
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>

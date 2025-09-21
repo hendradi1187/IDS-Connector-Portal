@@ -48,10 +48,10 @@ import { deleteDataRequest } from '@/app/data-requests/actions';
 import EditDataRequestDialog from './EditDataRequestDialog';
 
 const statusVariants: { [key in DataRequest['status']]: 'default' | 'destructive' | 'secondary' | 'outline' } = {
-  Pending: 'secondary',
-  Approved: 'default',
-  Delivered: 'default',
-  Rejected: 'destructive',
+  Tertunda: 'secondary',
+  Disetujui: 'default',
+  Terkirim: 'default',
+  Ditolak: 'destructive',
 };
 
 export default function DataRequestManagement() {
@@ -77,14 +77,14 @@ export default function DataRequestManagement() {
     try {
       await deleteDataRequest(request.id);
       toast({
-        title: 'Data Request Deleted',
-        description: `Request for "${request.resourceName}" has been successfully deleted.`,
+        title: 'Permintaan Data Dihapus',
+        description: `Permintaan untuk "${request.resourceName}" telah berhasil dihapus.`,
       });
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to delete data request. Please try again.',
+        description: 'Gagal menghapus permintaan data. Silakan coba lagi.',
       });
     }
   };
@@ -94,9 +94,9 @@ export default function DataRequestManagement() {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle>Data Request Management</CardTitle>
+            <CardTitle>Permintaan Data (Consumer)</CardTitle>
             <CardDescription>
-              Submit and track data requests from the connector.
+              Fungsi ini digunakan oleh SKK Migas untuk meminta data dari konektor KKKS.
             </CardDescription>
           </div>
           <AddDataRequestDialog />
@@ -106,13 +106,13 @@ export default function DataRequestManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Resource</TableHead>
-              <TableHead>Contract</TableHead>
-              <TableHead>Destination</TableHead>
+              <TableHead>Sumber Daya</TableHead>
+              <TableHead>Kontrak</TableHead>
+              <TableHead>Tujuan</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
+              <TableHead>Tanggal Dibuat</TableHead>
               <TableHead>
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">Aksi</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -150,7 +150,7 @@ export default function DataRequestManagement() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                           <EditDataRequestDialog dataRequest={request}>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                               Edit
@@ -163,20 +163,20 @@ export default function DataRequestManagement() {
                                 className="text-destructive"
                                 onSelect={(e) => e.preventDefault()}
                               >
-                                Delete
+                                Hapus
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the request for "{request.resourceName}".
+                                  Aksi ini tidak dapat dibatalkan. Ini akan menghapus permintaan untuk "{request.resourceName}" secara permanen.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>Batal</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => handleDelete(request)}>
-                                  Delete
+                                  Hapus
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>

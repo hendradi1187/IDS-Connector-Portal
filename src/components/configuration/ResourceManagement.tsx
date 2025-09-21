@@ -48,8 +48,8 @@ import { deleteResource } from '@/app/resources/actions';
 import EditResourceDialog from './EditResourceDialog';
 
 const statusVariants: { [key in Resource['status']]: 'default' | 'destructive' } = {
-  Available: 'default',
-  Deprecated: 'destructive',
+  Tersedia: 'default',
+  'Tidak Digunakan': 'destructive',
 };
 
 export default function ResourceManagement() {
@@ -67,6 +67,7 @@ export default function ResourceManagement() {
           id: doc.id,
           name: data.name,
           type: data.type,
+          description: data.description,
           created: data.created,
           status: data.status,
         });
@@ -82,14 +83,14 @@ export default function ResourceManagement() {
     try {
       await deleteResource(resource.id);
       toast({
-        title: 'Resource Deleted',
-        description: `Resource "${resource.name}" has been successfully deleted.`,
+        title: 'Sumber Daya Dihapus',
+        description: `Sumber daya "${resource.name}" telah berhasil dihapus.`,
       });
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to delete resource. Please try again.',
+        description: 'Gagal menghapus sumber daya. Silakan coba lagi.',
       });
     }
   };
@@ -99,9 +100,9 @@ export default function ResourceManagement() {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle>Resource Management</CardTitle>
+            <CardTitle>Manajemen Sumber Daya (Provider)</CardTitle>
             <CardDescription>
-              Facilitates CRUD operations for resources, contracts, and routes.
+              Fungsi ini digunakan oleh KKKS untuk mendaftarkan dan mengelola metadata sumber daya data yang akan dibagikan.
             </CardDescription>
           </div>
           <AddResourceDialog />
@@ -111,10 +112,10 @@ export default function ResourceManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
+              <TableHead>Nama Sumber Daya</TableHead>
+              <TableHead>Jenis Data</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
+              <TableHead>Tanggal Dibuat</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -162,7 +163,7 @@ export default function ResourceManagement() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                           <EditResourceDialog resource={resource}>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                               Edit
@@ -175,20 +176,20 @@ export default function ResourceManagement() {
                                 className="text-destructive"
                                 onSelect={(e) => e.preventDefault()}
                               >
-                                Delete
+                                Hapus
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the resource "{resource.name}".
+                                  Aksi ini tidak dapat dibatalkan. Ini akan menghapus sumber daya secara permanen "{resource.name}".
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>Batal</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => handleDelete(resource)}>
-                                  Delete
+                                  Hapus
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>

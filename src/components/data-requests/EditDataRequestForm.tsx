@@ -26,7 +26,7 @@ import { DataRequest } from '@/lib/types';
 import { useState } from 'react';
 
 const formSchema = z.object({
-  status: z.enum(['Pending', 'Approved', 'Delivered', 'Rejected']),
+  status: z.enum(['Tertunda', 'Disetujui', 'Terkirim', 'Ditolak']),
 });
 
 type EditDataRequestFormProps = {
@@ -50,15 +50,15 @@ export function EditDataRequestForm({ dataRequest, setOpen }: EditDataRequestFor
     try {
       await updateDataRequest(dataRequest.id, values);
       toast({
-        title: 'Data Request Updated',
-        description: `The request for "${dataRequest.resourceName}" has been updated.`,
+        title: 'Permintaan Data Diperbarui',
+        description: `Permintaan untuk "${dataRequest.resourceName}" telah diperbarui.`,
       });
       setOpen(false);
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to update data request. Please try again.',
+        description: 'Gagal memperbarui permintaan data. Silakan coba lagi.',
       });
     } finally {
       setLoading(false);
@@ -70,15 +70,15 @@ export function EditDataRequestForm({ dataRequest, setOpen }: EditDataRequestFor
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-4">
             <div>
-                <FormLabel>Resource</FormLabel>
+                <FormLabel>Sumber Daya</FormLabel>
                 <Input readOnly disabled value={dataRequest.resourceName} />
             </div>
             <div>
-                <FormLabel>Contract</FormLabel>
+                <FormLabel>Kontrak</FormLabel>
                 <Input readOnly disabled value={dataRequest.contractName} />
             </div>
              <div>
-                <FormLabel>Destination</FormLabel>
+                <FormLabel>Tujuan</FormLabel>
                 <Input readOnly disabled value={dataRequest.destination} />
             </div>
         </div>
@@ -91,14 +91,14 @@ export function EditDataRequestForm({ dataRequest, setOpen }: EditDataRequestFor
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Update request status" />
+                    <SelectValue placeholder="Perbarui status permintaan" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Approved">Approved</SelectItem>
-                  <SelectItem value="Delivered">Delivered</SelectItem>
-                  <SelectItem value="Rejected">Rejected</SelectItem>
+                  <SelectItem value="Tertunda">Tertunda</SelectItem>
+                  <SelectItem value="Disetujui">Disetujui</SelectItem>
+                  <SelectItem value="Terkirim">Terkirim</SelectItem>
+                  <SelectItem value="Ditolak">Ditolak</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -106,7 +106,7 @@ export function EditDataRequestForm({ dataRequest, setOpen }: EditDataRequestFor
           )}
         />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : 'Save Changes'}
+          {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
         </Button>
       </form>
     </Form>

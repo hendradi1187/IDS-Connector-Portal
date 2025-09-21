@@ -27,12 +27,12 @@ import { useState } from 'react';
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
+    message: 'Nama kontrak minimal 2 karakter.',
   }),
   provider: z.string().min(2, {
-    message: 'Provider must be at least 2 characters.',
+    message: 'Provider harus diisi.',
   }),
-  status: z.enum(['Active', 'Expired']),
+  status: z.enum(['Aktif', 'Kadaluarsa']),
 });
 
 type EditContractFormProps = {
@@ -57,15 +57,15 @@ export function EditContractForm({ contract, setOpen }: EditContractFormProps) {
     try {
       await updateContract(contract.id, values);
       toast({
-        title: 'Contract Updated',
-        description: `Contract "${values.name}" has been successfully updated.`,
+        title: 'Kontrak Diperbarui',
+        description: `Kontrak "${values.name}" telah berhasil diperbarui.`,
       });
       setOpen(false);
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to update contract. Please try again.',
+        description: 'Gagal memperbarui kontrak. Silakan coba lagi.',
       });
     } finally {
       setLoading(false);
@@ -80,9 +80,9 @@ export function EditContractForm({ contract, setOpen }: EditContractFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nama Kontrak</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Q4 Data Sharing Agreement" {...field} />
+                <Input placeholder="Contoh: Perjanjian Akses Data Produksi Q4" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -93,9 +93,9 @@ export function EditContractForm({ contract, setOpen }: EditContractFormProps) {
           name="provider"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Provider</FormLabel>
+              <FormLabel>KKKS (Provider)</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Partner Corp" {...field} />
+                <Input placeholder="Contoh: Pertamina Hulu Energi" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -110,12 +110,12 @@ export function EditContractForm({ contract, setOpen }: EditContractFormProps) {
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
+                    <SelectValue placeholder="Pilih status" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Expired">Expired</SelectItem>
+                  <SelectItem value="Aktif">Aktif</SelectItem>
+                  <SelectItem value="Kadaluarsa">Kadaluarsa</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -123,7 +123,7 @@ export function EditContractForm({ contract, setOpen }: EditContractFormProps) {
           )}
         />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : 'Save Changes'}
+          {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
         </Button>
       </form>
     </Form>

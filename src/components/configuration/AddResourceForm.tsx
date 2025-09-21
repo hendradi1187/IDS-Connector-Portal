@@ -24,15 +24,15 @@ import { addResource } from '@/app/resources/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Resource } from '@/lib/types';
 import { useState } from 'react';
+import { Textarea } from '../ui/textarea';
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
+    message: 'Nama harus diisi, minimal 2 karakter.',
   }),
-  type: z.string().min(2, {
-    message: 'Type must be at least 2 characters.',
-  }),
-  status: z.enum(['Available', 'Deprecated']),
+  description: z.string().optional(),
+  type: z.enum(['Peta GeoJSON', 'Data Sumur (Well Log)', 'Data Produksi', 'Lainnya']),
+  status: z.enum(['Tersedia', 'Tidak Digunakan']),
 });
 
 type AddResourceFormProps = {
@@ -46,8 +46,9 @@ export function AddResourceForm({ setOpen }: AddResourceFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      type: '',
-      status: 'Available',
+      description: '',
+      type: 'Peta GeoJSON',
+      status: 'Tersedia',
     },
   });
 
@@ -60,15 +61,15 @@ export function AddResourceForm({ setOpen }: AddResourceFormProps) {
       };
       await addResource(resourceData as Omit<Resource, 'id'>);
       toast({
-        title: 'Resource Added',
-        description: `Resource "${values.name}" has been successfully added.`,
+        title: 'Sumber Daya Ditambahkan',
+        description: `Sumber daya "${values.name}" telah berhasil ditambahkan.`,
       });
       setOpen(false);
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to add resource. Please try again.',
+        description: 'Gagal menambahkan sumber daya. Silakan coba lagi.',
       });
     } finally {
       setLoading(false);
@@ -83,9 +84,9 @@ export function AddResourceForm({ setOpen }: AddResourceFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nama Sumber Daya</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Sensor Data Stream v1.2" {...field} />
+                <Input placeholder="Contoh: Peta Seismik Blok A-1" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,9 +97,32 @@ export function AddResourceForm({ setOpen }: AddResourceFormProps) {
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Type</FormLabel>
+              <FormLabel>Jenis Data</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih jenis data" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Peta GeoJSON">Peta GeoJSON</SelectItem>
+                  <SelectItem value="Data Sumur (Well Log)">Data Sumur (Well Log)</SelectItem>
+                  <SelectItem value="Data Produksi">Data Produksi</SelectItem>
+                  <SelectItem value="Lainnya">Lainnya</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Deskripsi</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Data Stream" {...field} />
+                <Textarea placeholder="Deskripsi singkat mengenai data (misal: koordinat, periode akuisisi, dll.)" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,12 +137,12 @@ export function AddResourceForm({ setOpen }: AddResourceFormProps) {
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
+                    <SelectValue placeholder="Pilih status" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Available">Available</SelectItem>
-                  <SelectItem value="Deprecated">Deprecated</SelectItem>
+                  <SelectItem value="Tersedia">Tersedia</SelectItem>
+                  <SelectItem value="Tidak Digunakan">Tidak Digunakan</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -126,7 +150,7 @@ export function AddResourceForm({ setOpen }: AddResourceFormProps) {
           )}
         />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : 'Save Resource'}
+          {loading ? 'Menyimpan...' : 'Simpan Sumber Daya'}
         </Button>
       </form>
     </Form>

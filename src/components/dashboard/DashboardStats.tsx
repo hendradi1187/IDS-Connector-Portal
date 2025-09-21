@@ -37,7 +37,7 @@ export default function DashboardStats() {
         statsData.push({ id: doc.id, ...doc.data() } as Stat);
       });
       // Ensure a consistent order
-      const orderedTitles = ['Active Connectors', 'Data Routes', 'Recent Errors'];
+      const orderedTitles = ['Konektor KKKS Aktif', 'Rute Data', 'Kesalahan Terbaru'];
       statsData.sort((a, b) => orderedTitles.indexOf(a.title) - orderedTitles.indexOf(b.title));
       setStats(statsData);
       setLoading(false);

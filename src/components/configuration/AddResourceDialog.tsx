@@ -21,14 +21,14 @@ export default function AddResourceDialog() {
       <DialogTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span>Add Resource</span>
+          <span>Tambah Sumber Daya</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Resource</DialogTitle>
+          <DialogTitle>Tambah Sumber Daya Baru</DialogTitle>
           <DialogDescription>
-            Enter the details for the new resource. Click save when you're done.
+            Daftarkan metadata untuk sumber daya data baru, seperti peta GeoJSON atau data sumur.
           </DialogDescription>
         </DialogHeader>
         <AddResourceForm setOpen={setOpen} />

@@ -28,10 +28,10 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 const formSchema = z.object({
-  resourceId: z.string().min(1, { message: 'Please select a resource.' }),
-  contractId: z.string().min(1, { message: 'Please select a contract.' }),
-  destination: z.string().url({ message: 'Please enter a valid destination URL.' }),
-  status: z.enum(['Pending', 'Approved', 'Delivered', 'Rejected']),
+  resourceId: z.string().min(1, { message: 'Silakan pilih sumber daya.' }),
+  contractId: z.string().min(1, { message: 'Silakan pilih kontrak.' }),
+  destination: z.string().url({ message: 'Silakan masukkan URL tujuan yang valid.' }),
+  status: z.enum(['Tertunda', 'Disetujui', 'Terkirim', 'Ditolak']),
 });
 
 type AddDataRequestFormProps = {
@@ -50,13 +50,13 @@ export function AddDataRequestForm({ setOpen }: AddDataRequestFormProps) {
       resourceId: '',
       contractId: '',
       destination: '',
-      status: 'Pending',
+      status: 'Tertunda',
     },
   });
 
   useEffect(() => {
-    const resQuery = query(collection(db, 'resources'), where('status', '==', 'Available'));
-    const conQuery = query(collection(db, 'contracts'), where('status', '==', 'Active'));
+    const resQuery = query(collection(db, 'resources'), where('status', '==', 'Tersedia'));
+    const conQuery = query(collection(db, 'contracts'), where('status', '==', 'Aktif'));
 
     const unsubResources = onSnapshot(resQuery, (snapshot) => {
       const resourcesData: Resource[] = [];
@@ -83,7 +83,7 @@ export function AddDataRequestForm({ setOpen }: AddDataRequestFormProps) {
       const selectedContract = contracts.find(c => c.id === values.contractId);
 
       if (!selectedResource || !selectedContract) {
-        throw new Error("Selected resource or contract not found.");
+        throw new Error("Sumber daya atau kontrak yang dipilih tidak ditemukan.");
       }
 
       const requestData = {
@@ -95,15 +95,15 @@ export function AddDataRequestForm({ setOpen }: AddDataRequestFormProps) {
 
       await addDataRequest(requestData as Omit<DataRequest, 'id'>);
       toast({
-        title: 'Data Request Submitted',
-        description: `Your request for "${selectedResource.name}" has been successfully submitted.`,
+        title: 'Permintaan Data Terkirim',
+        description: `Permintaan Anda untuk "${selectedResource.name}" telah berhasil dikirim.`,
       });
       setOpen(false);
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to submit data request. Please try again.',
+        description: 'Gagal mengirim permintaan data. Silakan coba lagi.',
       });
     } finally {
       setLoading(false);
@@ -118,11 +118,11 @@ export function AddDataRequestForm({ setOpen }: AddDataRequestFormProps) {
           name="resourceId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Resource</FormLabel>
+              <FormLabel>Sumber Daya</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an available resource" />
+                    <SelectValue placeholder="Pilih sumber daya yang tersedia" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -140,11 +140,11 @@ export function AddDataRequestForm({ setOpen }: AddDataRequestFormProps) {
           name="contractId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contract</FormLabel>
+              <FormLabel>Kontrak</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an active contract" />
+                    <SelectValue placeholder="Pilih kontrak yang aktif" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -162,16 +162,16 @@ export function AddDataRequestForm({ setOpen }: AddDataRequestFormProps) {
           name="destination"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Destination URL</FormLabel>
+              <FormLabel>URL Tujuan</FormLabel>
               <FormControl>
-                <Input placeholder="https://api.example.com/receive_data" {...field} />
+                <Input placeholder="https://api.skkmigas.go.id/data-receiver" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Submitting...' : 'Submit Request'}
+          {loading ? 'Mengirim...' : 'Kirim Permintaan'}
         </Button>
       </form>
     </Form>

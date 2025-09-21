@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -13,10 +15,10 @@ import ConfigManagement from '@/components/configs/ConfigManagement';
 
 export default function DataManagementPage() {
   const tabs = [
-    { value: 'resources', label: 'Resources' },
-    { value: 'contracts', label: 'Contracts' },
-    { value: 'routes', label: 'Routes' },
-    { value: 'configs', label: 'Configs' },
+    { value: 'resources', label: 'Sumber Daya (Resources)' },
+    { value: 'contracts', label: 'Kontrak Penggunaan' },
+    { value: 'routes', label: 'Rute Data' },
+    { value: 'configs', label: 'Konfigurasi' },
   ];
 
   return (
@@ -24,8 +26,8 @@ export default function DataManagementPage() {
       <main className="flex flex-1 flex-col gap-4">
         <div className="grid gap-4">
            <header>
-            <h1 className="font-semibold text-3xl">Data Management</h1>
-            <p className="text-muted-foreground">Manage resources, contracts, routes, and configs.</p>
+            <h1 className="font-semibold text-3xl">Manajemen Data</h1>
+            <p className="text-muted-foreground">Kelola sumber daya data (seperti peta GeoJSON), kontrak, rute, dan konfigurasi.</p>
           </header>
           <Tabs defaultValue="resources" className="grid gap-4">
             <div className="overflow-x-auto">
