@@ -60,3 +60,11 @@ export type Contract = {
   created: string;
   status: 'Active' | 'Expired';
 };
+
+export type Route = {
+  id: string;
+  name: string;
+  endpoint: string;
+  created: string;
+  status: 'Active' | 'Inactive';
+};

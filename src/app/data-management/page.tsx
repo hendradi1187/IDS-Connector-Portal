@@ -8,6 +8,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ResourceManagement from '@/components/configuration/ResourceManagement';
 import ContractManagement from '@/components/contracts/ContractManagement';
+import RouteManagement from '@/components/routes/RouteManagement';
 
 function PlaceholderTab({ title }: { title: string }) {
   return (
@@ -60,7 +61,7 @@ export default function DataManagementPage() {
               <ContractManagement />
             </TabsContent>
             <TabsContent value="routes">
-              <PlaceholderTab title="Routes" />
+              <RouteManagement />
             </TabsContent>
             <TabsContent value="configs">
               <PlaceholderTab title="Configs" />
