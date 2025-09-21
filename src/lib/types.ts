@@ -85,3 +85,18 @@ export type ServiceApplication = {
   status: 'Active' | 'Inactive';
   created: string;
 };
+
+export type ApiStatus = {
+  id: string;
+  name: string;
+  status: 'Online' | 'Offline' | 'Degraded';
+  latency: number;
+};
+
+export type ProcessingLog = {
+  id: string;
+  timestamp: string;
+  service: string;
+  message: string;
+  level: 'Info' | 'Warning' | 'Error';
+};

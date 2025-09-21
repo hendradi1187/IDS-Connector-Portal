@@ -2,7 +2,7 @@
 
 Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Portal".
 
-**Kemajuan Keseluruhan: 90%**
+**Kemajuan Keseluruhan: 95%**
 
 ---
 
@@ -39,11 +39,11 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Implementasikan Formulir & Tabel untuk setiap tab.
   - [ ] Hubungkan setiap tab ke koleksi Firestore yang sesuai.
 
-- [ ] **Manajemen Data (10%)**
+- [x] **Manajemen Data (100%)**
   - [x] Buat halaman placeholder Manajemen Data.
-  - [ ] Hubungkan ke koleksi Firestore (resources, contracts, routes, configs).
-  - [ ] Implementasikan Tabel CRUD untuk setiap koleksi.
-  - [ ] Buat formulir untuk menambah/engedit data.
+  - [x] Hubungkan ke koleksi Firestore (resources, contracts, routes, configs).
+  - [x] Implementasikan Tabel CRUD untuk setiap koleksi.
+  - [x] Buat formulir untuk menambah/engedit data.
 
 - [x] **Pengontrol Konektor (100%)**
   - [x] Buat halaman Pengontrol Konektor.
@@ -55,15 +55,15 @@ Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Porta
   - [x] Tampilkan tabel dari koleksi yang sesuai untuk setiap modul (resources, policies, messages, users).
   - [x] Hubungkan ke data Firestore langsung.
 
-- [ ] **Routing & Services (5%)**
+- [x] **Routing & Services (100%)**
   - [x] Buat halaman placeholder Routing & Services.
-  - [ ] Implementasikan Tabel & Formulir CRUD untuk Rute Camel (koleksi "routes").
-  - [ ] Implementasikan Tabel & Formulir CRUD untuk Aplikasi Layanan (koleksi "services").
+  - [x] Implementasikan Tabel & Formulir CRUD untuk Rute Camel (koleksi "routes").
+  - [x] Implementasikan Tabel & Formulir CRUD untuk Aplikasi Layanan (koleksi "services").
 
-- [ ] **Sistem Backend (5%)**
+- [x] **Sistem Backend (100%)**
   - [x] Buat halaman placeholder Sistem Backend.
-  - [ ] Tampilkan kartu status API dari koleksi "apis".
-  - [ ] Tampilkan tabel log pemrosesan dari koleksi "processing_logs".
+  - [x] Tampilkan kartu status API dari koleksi "apis".
+  - [x] Tampilkan tabel log pemrosesan dari koleksi "processing_logs".
 
 - [x] **Layanan IDS Eksternal (100%)**
   - [x] Buat halaman placeholder Layanan Eksternal.
