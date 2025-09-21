@@ -1,8 +1,11 @@
+'use client';
+
 import BrokerManagement from '@/components/brokers/BrokerManagement';
 import ConfigManagement from '@/components/configs/ConfigManagement';
 import DataRequestManagement from '@/components/data-requests/DataRequestManagement';
 import ResourceManagement from '@/components/configuration/ResourceManagement';
 import RouteManagement from '@/components/routes/RouteManagement';
+import NetworkSettings from '@/components/network/NetworkSettings';
 import {
   Card,
   CardContent,
@@ -71,7 +74,7 @@ export default function GuiPage() {
               <BrokerManagement />
             </TabsContent>
             <TabsContent value="network-settings">
-              <PlaceholderTab title="Pengaturan Jaringan" />
+              <NetworkSettings />
             </TabsContent>
             <TabsContent value="container-management">
               <PlaceholderTab title="Manajemen Kontainer" />
