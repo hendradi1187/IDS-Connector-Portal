@@ -21,7 +21,8 @@ export async function addUser(user: Omit<User, 'id' | 'avatar' | 'createdAt'>) {
 export async function updateUser(id: string, user: Partial<Omit<User, 'id' | 'avatar' | 'createdAt'>>) {
   try {
     const userRef = doc(db, 'users', id);
-    await updateDoc(userRef, user);
+    const updateData = { ...user };
+    await updateDoc(userRef, updateData);
   } catch (e) {
     console.error('Error updating document: ', e);
     throw new Error('Failed to update user in database.');

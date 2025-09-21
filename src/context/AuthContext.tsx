@@ -30,16 +30,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser({ id: userDoc.id, ...userDoc.data() } as User);
         } else {
           // If user exists in Auth but not in Firestore, create a new Firestore document for them.
-          const newUser: Omit<User, 'id'> = {
+          const newUser: Omit<User, 'id' | 'createdAt'> = {
             name: firebaseUser.displayName || firebaseUser.email || 'New User',
             email: firebaseUser.email!,
-            role: 'Viewer', // Default role for new users
+            role: 'SKK-Consumer', // Default role for new users
             avatar: firebaseUser.photoURL || `https://picsum.photos/seed/${firebaseUser.uid}/32/32`,
             organization: 'Unknown',
-            createdAt: new Date().toISOString(),
           };
-          await setDoc(userDocRef, newUser);
-          setUser({ id: firebaseUser.uid, ...newUser });
+          const userWithTimestamp = {
+            ...newUser,
+            createdAt: new Date().toISOString(),
+          }
+          await setDoc(userDocRef, userWithTimestamp);
+          setUser({ id: firebaseUser.uid, ...userWithTimestamp } as User);
         }
       } else {
         // User is signed out
