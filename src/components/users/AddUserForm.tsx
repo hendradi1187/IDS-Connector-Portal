@@ -32,7 +32,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: 'Please enter a valid email address.',
   }),
-  role: z.enum(['Admin', 'Operator', 'Viewer']),
+  role: z.enum(['Admin', 'KKKS-Provider', 'SKK-Consumer']),
+  organization: z.string().min(2, { message: 'Organization is required.'}),
 });
 
 type AddUserFormProps = {
@@ -47,14 +48,15 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
     defaultValues: {
       name: '',
       email: '',
-      role: 'Viewer',
+      role: 'SKK-Consumer',
+      organization: '',
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      await addUser(values as Omit<User, 'id' | 'avatar'>);
+      await addUser(values as Omit<User, 'id' | 'avatar' | 'createdAt'>);
       toast({
         title: 'User Added',
         description: `User ${values.name} has been successfully added.`,
@@ -102,6 +104,19 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
         />
         <FormField
           control={form.control}
+          name="organization"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Organization</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., SKK Migas or Pertamina" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="role"
           render={({ field }) => (
             <FormItem>
@@ -114,8 +129,8 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Operator">Operator</SelectItem>
-                  <SelectItem value="Viewer">Viewer</SelectItem>
+                  <SelectItem value="KKKS-Provider">KKKS-Provider</SelectItem>
+                  <SelectItem value="SKK-Consumer">SKK-Consumer</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

@@ -4,11 +4,12 @@ import { db } from '@/lib/firebase';
 import { User } from '@/lib/types';
 import { collection, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-export async function addUser(user: Omit<User, 'id' | 'avatar'>) {
+export async function addUser(user: Omit<User, 'id' | 'avatar' | 'createdAt'>) {
   try {
     const docRef = await addDoc(collection(db, 'users'), {
       ...user,
       avatar: `https://picsum.photos/seed/${Math.random()}/32/32`,
+      createdAt: new Date().toISOString(),
     });
     return { id: docRef.id, ...user };
   } catch (e) {
@@ -17,7 +18,7 @@ export async function addUser(user: Omit<User, 'id' | 'avatar'>) {
   }
 }
 
-export async function updateUser(id: string, user: Partial<Omit<User, 'id' | 'avatar'>>) {
+export async function updateUser(id: string, user: Partial<Omit<User, 'id' | 'avatar' | 'createdAt'>>) {
   try {
     const userRef = doc(db, 'users', id);
     await updateDoc(userRef, user);

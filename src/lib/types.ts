@@ -2,6 +2,7 @@
 export type User = {
   id: string; // userId from Firebase Auth UID
   email: string;
+  name: string;
   role: 'KKKS-Provider' | 'SKK-Consumer' | 'Admin';
   organization: string;
   createdAt: string;
@@ -10,50 +11,62 @@ export type User = {
 
 export type DataRequest = {
   id: string; // requestId
+  resourceName: string;
+  contractName: string;
   requesterId: string; // userId SKK Migas
   providerId: string; // userId KKKS
   resourceId: string;
   requestType: 'GeoJSON' | 'Seismic' | 'Production';
-  status: 'pending' | 'approved' | 'rejected' | 'delivered';
+  status: 'Tertunda' | 'Disetujui' | 'Terkirim' | 'Ditolak';
   purpose: string;
   createdAt: string;
   updatedAt: string;
+  destination: string;
+  created: string;
 };
 
 export type Resource = {
   id: string; // resourceId
-  providerId: string;
+  providerId?: string; // Optional for backward compatibility
   name: string;
   description: string;
-  type: 'GeoJSON' | 'CSV' | 'Well Data';
-  storagePath: string; // link Firebase Storage
-  metadata: {
+  type: 'Peta GeoJSON' | 'Data Sumur (Well Log)' | 'Data Produksi' | 'Lainnya';
+  storagePath?: string; // link Firebase Storage
+  metadata?: {
     lokasi: { latitude: number; longitude: number };
     luas_area: number;
     periode: string;
   };
-  accessPolicy: 'restricted' | 'public' | 'contract-only';
-  createdAt: string;
-  updatedAt: string;
+  accessPolicy?: 'restricted' | 'public' | 'contract-only';
+  createdAt?: string;
+  updatedAt?: string;
+  created: string;
+  status: 'Tersedia' | 'Tidak Digunakan';
 };
 
 export type Route = {
   id: string; // routeId
-  providerId: string;
-  consumerId: string;
-  resourceId: string;
-  status: 'active' | 'inactive';
-  validUntil: string; // timestamp
-  createdAt: string;
+  providerId?: string;
+  consumerId?: string;
+  resourceId?: string;
+  status: 'Active' | 'Inactive';
+  validUntil?: string; // timestamp
+  created: string;
+  name: string;
+  endpoint: string;
 };
 
 export type Broker = {
   id: string; // brokerId
-  transactionId: string;
-  requestId: string;
-  validationStatus: 'pending' | 'approved' | 'rejected';
-  notes: string;
-  timestamp: string;
+  transactionId?: string;
+  requestId?: string;
+  validationStatus?: 'pending' | 'approved' | 'rejected';
+  notes?: string;
+  timestamp?: string;
+  name: string;
+  url: string;
+  status: 'Registered' | 'Unregistered';
+  created: string;
 };
 
 export type NetworkSetting = {
@@ -75,10 +88,14 @@ export type Container = {
 };
 
 export type ActivityLog = {
-  id: string; // logId implicit
-  action: 'upload_resource' | 'request_data' | 'approve_request';
-  userId: string;
-  details: Record<string, any>;
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  action: 'CREATE_ROUTE' | 'UPDATE_RESOURCE' | 'CONNECTOR_RESTART' | 'DELETE_CONTRACT' | 'LOGIN' | 'upload_resource' | 'request_data' | 'approve_request';
+  details: string | Record<string, any>;
+  status: 'Success' | 'Failed' | 'In Progress';
   timestamp: string;
 };
 

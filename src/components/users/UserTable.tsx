@@ -9,13 +9,13 @@ import {
 } from '@/components/ui/table';
 import { User } from '@/lib/types';
 import { useEffect, useMemo, useState } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Skeleton } from '../ui/skeleton';
 import UserTableRow from './UserTableRow';
 
 type UserTableProps = {
-  role: 'all' | User['role'];
+  role: 'all' | 'Admin' | 'KKKS-Provider' | 'SKK-Consumer';
 };
 
 export default function UserTable({ role }: UserTableProps) {
@@ -23,7 +23,8 @@ export default function UserTable({ role }: UserTableProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
+    const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const usersData: User[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -33,6 +34,8 @@ export default function UserTable({ role }: UserTableProps) {
           email: data.email,
           role: data.role,
           avatar: data.avatar,
+          organization: data.organization,
+          createdAt: data.createdAt,
         });
       });
       setUsers(usersData);
@@ -73,6 +76,7 @@ export default function UserTable({ role }: UserTableProps) {
         <TableRow>
           <TableHead>User</TableHead>
           <TableHead>Role</TableHead>
+          <TableHead>Organization</TableHead>
           <TableHead>
             <span className="sr-only">Actions</span>
           </TableHead>

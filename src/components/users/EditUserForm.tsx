@@ -32,7 +32,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: 'Please enter a valid email address.',
   }),
-  role: z.enum(['Admin', 'Operator', 'Viewer']),
+  role: z.enum(['Admin', 'KKKS-Provider', 'SKK-Consumer']),
+  organization: z.string().min(2, { message: 'Organization is required.'}),
 });
 
 type EditUserFormProps = {
@@ -49,6 +50,7 @@ export function EditUserForm({ user, setOpen }: EditUserFormProps) {
       name: user.name,
       email: user.email,
       role: user.role,
+      organization: user.organization,
     },
   });
 
@@ -103,6 +105,19 @@ export function EditUserForm({ user, setOpen }: EditUserFormProps) {
         />
         <FormField
           control={form.control}
+          name="organization"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Organization</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., SKK Migas or Pertamina" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="role"
           render={({ field }) => (
             <FormItem>
@@ -115,8 +130,8 @@ export function EditUserForm({ user, setOpen }: EditUserFormProps) {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Operator">Operator</SelectItem>
-                  <SelectItem value="Viewer">Viewer</SelectItem>
+                  <SelectItem value="KKKS-Provider">KKKS-Provider</SelectItem>
+                  <SelectItem value="SKK-Consumer">SKK-Consumer</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

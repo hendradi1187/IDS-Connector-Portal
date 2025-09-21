@@ -32,10 +32,10 @@ import { deleteUser } from '@/app/users/actions';
 import { useToast } from '@/hooks/use-toast';
 import EditUserDialog from './EditUserDialog';
 
-const roleVariants = {
+const roleVariants: { [key in User['role']]: 'default' | 'secondary' | 'outline' } = {
   Admin: 'default',
-  Operator: 'secondary',
-  Viewer: 'outline',
+  'KKKS-Provider': 'secondary',
+  'SKK-Consumer': 'outline',
 };
 
 type UserTableRowProps = {
@@ -77,12 +77,13 @@ export default function UserTableRow({ user }: UserTableRowProps) {
       </TableCell>
       <TableCell>
         <Badge
-          variant={
-            roleVariants[user.role] as 'default' | 'secondary' | 'outline'
-          }
+          variant={roleVariants[user.role]}
         >
           {user.role}
         </Badge>
+      </TableCell>
+      <TableCell>
+         <div className="text-sm text-muted-foreground">{user.organization}</div>
       </TableCell>
       <TableCell className="text-right">
         <DropdownMenu>

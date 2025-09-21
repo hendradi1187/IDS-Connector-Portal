@@ -18,8 +18,8 @@ export default function UsersPage() {
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="admin">Admins</TabsTrigger>
-          <TabsTrigger value="operator">Operators</TabsTrigger>
-          <TabsTrigger value="viewer">Viewers</TabsTrigger>
+          <TabsTrigger value="kkks">KKKS-Providers</TabsTrigger>
+          <TabsTrigger value="skk">SKK-Consumers</TabsTrigger>
         </TabsList>
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="outline">
@@ -54,29 +54,29 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       </TabsContent>
-       <TabsContent value="operator">
+       <TabsContent value="kkks">
         <Card>
           <CardHeader>
-            <CardTitle>Operators</CardTitle>
+            <CardTitle>KKKS Providers</CardTitle>
             <CardDescription>
-              Users who can manage connectors and routes.
+              Users from KKKS who provide data.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <UserTable role="Operator" />
+            <UserTable role="KKKS-Provider" />
           </CardContent>
         </Card>
       </TabsContent>
-       <TabsContent value="viewer">
+       <TabsContent value="skk">
         <Card>
           <CardHeader>
-            <CardTitle>Viewers</CardTitle>
+            <CardTitle>SKK Consumers</CardTitle>
             <CardDescription>
-             Users with read-only access to the portal.
+             Users from SKK Migas who consume data.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <UserTable role="Viewer" />
+            <UserTable role="SKK-Consumer" />
           </CardContent>
         </Card>
       </TabsContent>
