@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -115,6 +116,3 @@ export default function Header() {
     </header>
   );
 }
-
-// React needed for fragment
-import React from 'react';
