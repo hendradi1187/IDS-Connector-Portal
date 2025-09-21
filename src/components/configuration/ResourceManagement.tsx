@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -23,9 +25,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { mockResources } from '@/lib/data';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import { Resource } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Skeleton } from '../ui/skeleton';
 
 const statusVariants: { [key in Resource['status']]: 'default' | 'destructive' } = {
   Available: 'default',
@@ -33,6 +38,29 @@ const statusVariants: { [key in Resource['status']]: 'default' | 'destructive' }
 };
 
 export default function ResourceManagement() {
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'resources'), (snapshot) => {
+      const resourcesData: Resource[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        resourcesData.push({
+          id: doc.id,
+          name: data.name,
+          type: data.type,
+          created: data.created,
+          status: data.status,
+        });
+      });
+      setResources(resourcesData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -63,39 +91,52 @@ export default function ResourceManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockResources.map((resource) => (
-              <TableRow key={resource.id}>
-                <TableCell className="font-medium">{resource.name}</TableCell>
-                <TableCell>{resource.type}</TableCell>
-                <TableCell>
-                  <Badge variant={statusVariants[resource.status]}>
-                    {resource.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>{resource.created}</TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-end">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {loading ? (
+              [...Array(4)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell colSpan={4}>
+                    <Skeleton className="h-5 w-full" />
+                  </TableCell>
+                   <TableCell>
+                    <Skeleton className="h-8 w-8 ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              resources.map((resource) => (
+                <TableRow key={resource.id}>
+                  <TableCell className="font-medium">{resource.name}</TableCell>
+                  <TableCell>{resource.type}</TableCell>
+                  <TableCell>
+                    <Badge variant={statusVariants[resource.status]}>
+                      {resource.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{resource.created}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button aria-haspopup="true" size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive">
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>
