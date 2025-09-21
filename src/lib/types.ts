@@ -108,3 +108,14 @@ export type Broker = {
   status: 'Registered' | 'Unregistered';
   created: string;
 };
+
+export type DataRequest = {
+  id: string;
+  resourceId: string;
+  resourceName: string;
+  contractId: string;
+  contractName: string;
+  destination: string;
+  status: 'Pending' | 'Approved' | 'Delivered' | 'Rejected';
+  created: string;
+};

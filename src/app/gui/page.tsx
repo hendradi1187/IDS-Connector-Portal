@@ -1,3 +1,8 @@
+import BrokerManagement from '@/components/brokers/BrokerManagement';
+import ConfigManagement from '@/components/configs/ConfigManagement';
+import DataRequestManagement from '@/components/data-requests/DataRequestManagement';
+import ResourceManagement from '@/components/configuration/ResourceManagement';
+import RouteManagement from '@/components/routes/RouteManagement';
 import {
   Card,
   CardContent,
@@ -6,10 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ResourceManagement from '@/components/configuration/ResourceManagement';
-import RouteManagement from '@/components/routes/RouteManagement';
-import ConfigManagement from '@/components/configs/ConfigManagement';
-import BrokerManagement from '@/components/brokers/BrokerManagement';
+
 
 function PlaceholderTab({ title }: { title: string }) {
   return (
@@ -32,13 +34,13 @@ function PlaceholderTab({ title }: { title: string }) {
 export default function GuiPage() {
   const tabs = [
     { value: 'request-data', label: 'Minta Data' },
+    { value: 'resource-management', label: 'Kelola Sumber Daya' },
     { value: 'app-routes', label: 'Rute Aplikasi' },
+    { value: 'broker-management', label: 'Kelola Broker' },
     { value: 'network-settings', label: 'Pengaturan Jaringan' },
     { value: 'container-management', label: 'Manajemen Kontainer' },
     { value: 'configure-connector', label: 'Konfigurasi Konektor' },
-    { value: 'resource-management', label: 'Kelola Sumber Daya' },
     { value: 'data-sources', label: 'Kelola Sumber Data' },
-    { value: 'broker-management', label: 'Kelola Broker' },
   ];
 
   return (
@@ -46,7 +48,7 @@ export default function GuiPage() {
       <main className="flex flex-1 flex-col gap-4">
         <div className="grid gap-4">
           <h1 className="font-semibold text-3xl">GUI</h1>
-          <Tabs defaultValue="resource-management" className="grid gap-4">
+          <Tabs defaultValue="request-data" className="grid gap-4">
             <div className="overflow-x-auto">
               <TabsList>
                 {tabs.map((tab) => (
@@ -57,10 +59,16 @@ export default function GuiPage() {
               </TabsList>
             </div>
             <TabsContent value="request-data">
-              <PlaceholderTab title="Minta Data" />
+              <DataRequestManagement />
+            </TabsContent>
+            <TabsContent value="resource-management">
+              <ResourceManagement />
             </TabsContent>
             <TabsContent value="app-routes">
               <RouteManagement />
+            </TabsContent>
+             <TabsContent value="broker-management">
+              <BrokerManagement />
             </TabsContent>
             <TabsContent value="network-settings">
               <PlaceholderTab title="Pengaturan Jaringan" />
@@ -71,14 +79,8 @@ export default function GuiPage() {
             <TabsContent value="configure-connector">
               <ConfigManagement />
             </TabsContent>
-            <TabsContent value="resource-management">
-              <ResourceManagement />
-            </TabsContent>
             <TabsContent value="data-sources">
               <PlaceholderTab title="Kelola Sumber Data" />
-            </TabsContent>
-            <TabsContent value="broker-management">
-              <BrokerManagement />
             </TabsContent>
           </Tabs>
         </div>
