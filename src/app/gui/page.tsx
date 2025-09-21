@@ -14,12 +14,12 @@ function PlaceholderTab({ title }: { title: string }) {
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>
-          Manage {title.toLowerCase()} for your connector.
+          Kelola {title.toLowerCase()} untuk konektor Anda.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20">
-          <p className="text-muted-foreground">{title} Management UI</p>
+          <p className="text-muted-foreground">{title} UI Manajemen</p>
         </div>
       </CardContent>
     </Card>
@@ -28,13 +28,14 @@ function PlaceholderTab({ title }: { title: string }) {
 
 export default function GuiPage() {
   const tabs = [
-    { value: 'request-data', label: 'Request Data' },
-    { value: 'connector-config', label: 'Connector' },
-    { value: 'resource-management', label: 'Resources' },
-    { value: 'route-management', label: 'Routes' },
-    { value: 'broker-management', label: 'Brokers' },
-    { value: 'network-settings', label: 'Network' },
-    { value: 'container-management', label: 'Containers' },
+    { value: 'request-data', label: 'Minta Data' },
+    { value: 'app-routes', label: 'Rute Aplikasi' },
+    { value: 'network-settings', label: 'Pengaturan Jaringan' },
+    { value: 'container-management', label: 'Manajemen Kontainer' },
+    { value: 'configure-connector', label: 'Konfigurasi Konektor' },
+    { value: 'resource-management', label: 'Kelola Sumber Daya' },
+    { value: 'data-sources', label: 'Kelola Sumber Data' },
+    { value: 'broker-management', label: 'Kelola Broker' },
   ];
 
   return (
