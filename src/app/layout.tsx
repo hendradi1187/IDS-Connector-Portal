@@ -1,16 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/AuthContext';
+import { LanguageProvider } from '@/context/LanguageContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import AuthGuard from '@/components/layout/AuthGuard';
 import AppLayout from '@/components/layout/AppLayout';
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
 
 export const metadata: Metadata = {
   title: 'IDS Connector Portal',
@@ -33,14 +29,18 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={cn('font-body antialiased', inter.variable)}>
-        <AuthProvider>
-          <AuthGuard>
-            <AppLayout>
-              {children}
-            </AppLayout>
-          </AuthGuard>
-        </AuthProvider>
+      <body className={cn('font-body antialiased')}>
+        <ThemeProvider defaultTheme="light" storageKey="ids-portal-theme">
+          <LanguageProvider>
+            <AuthProvider>
+              <AuthGuard>
+                <AppLayout>
+                  {children}
+                </AppLayout>
+              </AuthGuard>
+            </AuthProvider>
+          </LanguageProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

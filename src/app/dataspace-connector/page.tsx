@@ -1,5 +1,5 @@
-import DataspaceModules from '@/components/dashboard/DataspaceModules';
+import DataspaceConnectorManagement from '@/components/dataspace-connector/DataspaceConnectorManagement';
 
 export default function DataspaceConnectorPage() {
-  return <DataspaceModules />;
+  return <DataspaceConnectorManagement />;
 }

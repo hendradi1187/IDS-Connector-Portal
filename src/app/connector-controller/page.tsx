@@ -1,5 +1,5 @@
-import ConnectorStatus from '@/components/connector-controller/ConnectorStatus';
+import ConnectorControllerManagement from '@/components/connector-controller/ConnectorControllerManagement';
 
 export default function ConnectorControllerPage() {
-  return <ConnectorStatus />;
+  return <ConnectorControllerManagement />;
 }

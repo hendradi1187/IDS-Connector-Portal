@@ -1,0 +1,758 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  MapPin,
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  FileText,
+  Trash2,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Map,
+  BarChart3,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+import WorkingAreaForm from './WorkingAreaForm';
+import ImportDataDialog from '@/components/dialogs/ImportDataDialog';
+import ExportReportDialog from '@/components/dialogs/ExportReportDialog';
+
+interface WorkingArea {
+  id: string;
+  wkId: string;
+  namaWk: string;
+  statusWk: 'AKTIF' | 'TERMINASI' | 'SUSPENSI' | 'RELINQUISH' | 'EXPIRED';
+  provinsi1?: string;
+  provinsi2?: string;
+  lokasi: 'ONSHORE' | 'OFFSHORE' | 'ONSHORE_OFFSHORE';
+  jenisKontrak: 'PSC' | 'GROSS_SPLIT' | 'TAC' | 'SERVICE_CONTRACT';
+  effectiveDate: string;
+  expireDate?: string;
+  holding: string;
+  faseWk: 'EKSPLORASI' | 'PRODUKSI' | 'DEVELOPMENT' | 'ABANDONMENT';
+  luasWkAwal?: number;
+  luasWk?: number;
+  namaCekungan?: string;
+  statusCekungan?: string;
+  participatingInterest?: number;
+  kewenangan: 'SKK_MIGAS' | 'BPMA' | 'PUSAT' | 'DAERAH';
+  attachment?: any;
+  shape: any;
+  crsEpsg: number;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    fields: number;
+    wells: number;
+    seismicSurveys: number;
+    facilities: number;
+  };
+}
+
+interface WorkingAreaStats {
+  overview: {
+    total: number;
+    recentlyAdded: number;
+    averageArea: number;
+    totalRelatedData: {
+      fields: number;
+      wells: number;
+      seismicSurveys: number;
+      facilities: number;
+    };
+  };
+  distribution: {
+    byStatus: Array<{ status: string; count: number }>;
+    byJenisKontrak: Array<{ jenisKontrak: string; count: number }>;
+    byLokasi: Array<{ lokasi: string; count: number }>;
+    byFase: Array<{ fase: string; count: number }>;
+    byKewenangan: Array<{ kewenangan: string; count: number }>;
+    topProvinces: Array<{ provinsi: string; count: number }>;
+  };
+}
+
+const statusVariants = {
+  AKTIF: 'default' as const,
+  TERMINASI: 'destructive' as const,
+  SUSPENSI: 'secondary' as const,
+  RELINQUISH: 'outline' as const,
+  EXPIRED: 'destructive' as const,
+};
+
+const lokasiVariants = {
+  ONSHORE: 'default' as const,
+  OFFSHORE: 'secondary' as const,
+  ONSHORE_OFFSHORE: 'outline' as const,
+};
+
+const jenisKontrakVariants = {
+  PSC: 'default' as const,
+  GROSS_SPLIT: 'secondary' as const,
+  TAC: 'outline' as const,
+  SERVICE_CONTRACT: 'outline' as const,
+};
+
+export default function WorkingAreaManagement() {
+  const [workingAreas, setWorkingAreas] = useState<WorkingArea[]>([]);
+  const [stats, setStats] = useState<WorkingAreaStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [jenisKontrakFilter, setJenisKontrakFilter] = useState<string>('');
+  const [lokasiFilter, setLokasiFilter] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [selectedWorkingArea, setSelectedWorkingArea] = useState<WorkingArea | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+
+  useEffect(() => {
+    fetchWorkingAreas();
+    fetchStats();
+  }, [currentPage, searchTerm, statusFilter, jenisKontrakFilter, lokasiFilter]);
+
+  const fetchWorkingAreas = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '10',
+        ...(searchTerm && { search: searchTerm }),
+        ...(statusFilter && { status: statusFilter }),
+        ...(jenisKontrakFilter && { jenisKontrak: jenisKontrakFilter }),
+        ...(lokasiFilter && { lokasi: lokasiFilter }),
+      });
+
+      const response = await fetch(`/api/mdm/working-areas?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setWorkingAreas(data.data);
+        setTotalPages(data.pagination.totalPages);
+      }
+    } catch (error) {
+      console.error('Error fetching working areas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/mdm/working-areas/stats');
+      const data = await response.json();
+
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (type: string, value: string) => {
+    switch (type) {
+      case 'status':
+        setStatusFilter(value);
+        break;
+      case 'jenisKontrak':
+        setJenisKontrakFilter(value);
+        break;
+      case 'lokasi':
+        setLokasiFilter(value);
+        break;
+    }
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('');
+    setJenisKontrakFilter('');
+    setLokasiFilter('');
+    setCurrentPage(1);
+  };
+
+  const handleView = (workingArea: WorkingArea) => {
+    setSelectedWorkingArea(workingArea);
+    setShowDetailsDialog(true);
+  };
+
+  const handleEdit = (workingArea: WorkingArea) => {
+    setSelectedWorkingArea(workingArea);
+    setShowCreateDialog(true);
+  };
+
+  const handleDelete = async (workingArea: WorkingArea) => {
+    if (confirm(`Are you sure you want to delete working area ${workingArea.wkId}?`)) {
+      try {
+        const response = await fetch(`/api/mdm/working-areas/${workingArea.id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          fetchWorkingAreas();
+          fetchStats();
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Failed to delete working area');
+        }
+      } catch (error) {
+        console.error('Error deleting working area:', error);
+        alert('Failed to delete working area');
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Working Area Management</h1>
+          <p className="text-muted-foreground">
+            Manajemen data Wilayah Kerja KKKS sesuai SKK Migas Data Specification v2
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowImportDialog(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setShowExportDialog(true)}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Working Area
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedWorkingArea ? 'Edit Working Area' : 'Add New Working Area'}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedWorkingArea
+                    ? `Edit working area ${selectedWorkingArea.wkId}`
+                    : 'Create a new working area record'
+                  }
+                </DialogDescription>
+              </DialogHeader>
+              <WorkingAreaForm
+                workingArea={selectedWorkingArea}
+                onSuccess={() => {
+                  setShowCreateDialog(false);
+                  setSelectedWorkingArea(null);
+                  fetchWorkingAreas();
+                  fetchStats();
+                }}
+                onCancel={() => {
+                  setShowCreateDialog(false);
+                  setSelectedWorkingArea(null);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="list">Working Areas</TabsTrigger>
+          <TabsTrigger value="map">Map View</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          {/* Stats Cards */}
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Working Areas</CardTitle>
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.overview.total}</div>
+                  <p className="text-xs text-muted-foreground">
+                    +{stats.overview.recentlyAdded} in last 30 days
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Fields</CardTitle>
+                  <Map className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.overview.totalRelatedData.fields}</div>
+                  <p className="text-xs text-muted-foreground">Active fields</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Wells</CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.overview.totalRelatedData.wells}</div>
+                  <p className="text-xs text-muted-foreground">All well types</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Average Area</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {stats.overview.averageArea.toFixed(1)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">km²</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Distribution Charts */}
+          {stats && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Status Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.distribution.byStatus.map((item) => (
+                      <div key={item.status} className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={statusVariants[item.status as keyof typeof statusVariants]}>
+                            {item.status}
+                          </Badge>
+                        </div>
+                        <span className="font-medium">{item.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contract Type Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.distribution.byJenisKontrak.map((item) => (
+                      <div key={item.jenisKontrak} className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={jenisKontrakVariants[item.jenisKontrak as keyof typeof jenisKontrakVariants]}>
+                            {item.jenisKontrak}
+                          </Badge>
+                        </div>
+                        <span className="font-medium">{item.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="list" className="space-y-4">
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Filters</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-4">
+                <div className="flex-1 min-w-[200px]">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search working areas..."
+                      value={searchTerm}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="AKTIF">Aktif</SelectItem>
+                    <SelectItem value="TERMINASI">Terminasi</SelectItem>
+                    <SelectItem value="SUSPENSI">Suspensi</SelectItem>
+                    <SelectItem value="RELINQUISH">Relinquish</SelectItem>
+                    <SelectItem value="EXPIRED">Expired</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={jenisKontrakFilter} onValueChange={(value) => handleFilterChange('jenisKontrak', value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Jenis Kontrak" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Contracts</SelectItem>
+                    <SelectItem value="PSC">PSC</SelectItem>
+                    <SelectItem value="GROSS_SPLIT">Gross Split</SelectItem>
+                    <SelectItem value="TAC">TAC</SelectItem>
+                    <SelectItem value="SERVICE_CONTRACT">Service Contract</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={lokasiFilter} onValueChange={(value) => handleFilterChange('lokasi', value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Lokasi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Locations</SelectItem>
+                    <SelectItem value="ONSHORE">Onshore</SelectItem>
+                    <SelectItem value="OFFSHORE">Offshore</SelectItem>
+                    <SelectItem value="ONSHORE_OFFSHORE">Onshore-Offshore</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" onClick={clearFilters}>
+                  <Filter className="h-4 w-4 mr-2" />
+                  Clear
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Working Areas Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Working Areas List</CardTitle>
+              <CardDescription>
+                {workingAreas.length} working areas found
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="text-center py-8">Loading...</div>
+              ) : workingAreas.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No working areas found
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {workingAreas.map((workingArea) => (
+                    <div
+                      key={workingArea.id}
+                      className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3">
+                            <h3 className="font-semibold">{workingArea.wkId}</h3>
+                            <Badge variant={statusVariants[workingArea.statusWk]}>
+                              {workingArea.statusWk}
+                            </Badge>
+                            <Badge variant={lokasiVariants[workingArea.lokasi]}>
+                              {workingArea.lokasi}
+                            </Badge>
+                            <Badge variant={jenisKontrakVariants[workingArea.jenisKontrak]}>
+                              {workingArea.jenisKontrak}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {workingArea.namaWk}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>Holding: {workingArea.holding}</span>
+                            <span>Fase: {workingArea.faseWk}</span>
+                            {workingArea.luasWk && (
+                              <span>Area: {workingArea.luasWk.toFixed(2)} km²</span>
+                            )}
+                            <span>Fields: {workingArea._count.fields}</span>
+                            <span>Wells: {workingArea._count.wells}</span>
+                          </div>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleView(workingArea)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(workingArea)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(workingArea)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    Previous
+                  </Button>
+                  <span className="flex items-center px-3">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="map" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Working Areas Map</CardTitle>
+              <CardDescription>
+                Geographic visualization of working areas with WGS 84 coordinates
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-96 flex items-center justify-center border-2 border-dashed border-muted-foreground/30 bg-muted/20 rounded-lg">
+                <div className="text-center">
+                  <Map className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">Map visualization will be implemented here</p>
+                  <p className="text-sm text-muted-foreground">Using Leaflet/MapBox with WGS 84 projection</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Location Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {stats && (
+                  <div className="space-y-3">
+                    {stats.distribution.byLokasi.map((item) => (
+                      <div key={item.lokasi} className="flex justify-between items-center">
+                        <Badge variant={lokasiVariants[item.lokasi as keyof typeof lokasiVariants]}>
+                          {item.lokasi}
+                        </Badge>
+                        <span className="font-medium">{item.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Provinces</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {stats && (
+                  <div className="space-y-3">
+                    {stats.distribution.topProvinces.slice(0, 10).map((item, index) => (
+                      <div key={item.provinsi} className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">#{index + 1}</span>
+                          {item.provinsi}
+                        </span>
+                        <span className="font-medium">{item.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Working Area Details</DialogTitle>
+            <DialogDescription>
+              Detailed information for working area {selectedWorkingArea?.wkId}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedWorkingArea && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Basic Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div><strong>WK ID:</strong> {selectedWorkingArea.wkId}</div>
+                    <div><strong>Name:</strong> {selectedWorkingArea.namaWk}</div>
+                    <div><strong>Status:</strong> {selectedWorkingArea.statusWk}</div>
+                    <div><strong>Location:</strong> {selectedWorkingArea.lokasi}</div>
+                    <div><strong>Contract Type:</strong> {selectedWorkingArea.jenisKontrak}</div>
+                    <div><strong>Phase:</strong> {selectedWorkingArea.faseWk}</div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Contract Details</h3>
+                  <div className="space-y-2 text-sm">
+                    <div><strong>Holding:</strong> {selectedWorkingArea.holding}</div>
+                    <div><strong>Effective Date:</strong> {new Date(selectedWorkingArea.effectiveDate).toLocaleDateString()}</div>
+                    {selectedWorkingArea.expireDate && (
+                      <div><strong>Expire Date:</strong> {new Date(selectedWorkingArea.expireDate).toLocaleDateString()}</div>
+                    )}
+                    <div><strong>Authority:</strong> {selectedWorkingArea.kewenangan}</div>
+                    {selectedWorkingArea.participatingInterest && (
+                      <div><strong>Participating Interest:</strong> {selectedWorkingArea.participatingInterest}%</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Geographic Information</h3>
+                  <div className="space-y-2 text-sm">
+                    {selectedWorkingArea.provinsi1 && (
+                      <div><strong>Province 1:</strong> {selectedWorkingArea.provinsi1}</div>
+                    )}
+                    {selectedWorkingArea.provinsi2 && (
+                      <div><strong>Province 2:</strong> {selectedWorkingArea.provinsi2}</div>
+                    )}
+                    {selectedWorkingArea.namaCekungan && (
+                      <div><strong>Basin:</strong> {selectedWorkingArea.namaCekungan}</div>
+                    )}
+                    <div><strong>CRS EPSG:</strong> {selectedWorkingArea.crsEpsg}</div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Area Information</h3>
+                  <div className="space-y-2 text-sm">
+                    {selectedWorkingArea.luasWkAwal && (
+                      <div><strong>Initial Area:</strong> {selectedWorkingArea.luasWkAwal.toFixed(2)} km²</div>
+                    )}
+                    {selectedWorkingArea.luasWk && (
+                      <div><strong>Current Area:</strong> {selectedWorkingArea.luasWk.toFixed(2)} km²</div>
+                    )}
+                    {selectedWorkingArea.statusCekungan && (
+                      <div><strong>Basin Status:</strong> {selectedWorkingArea.statusCekungan}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Related Data</h3>
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{selectedWorkingArea._count.fields}</div>
+                    <div className="text-sm text-muted-foreground">Fields</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{selectedWorkingArea._count.wells}</div>
+                    <div className="text-sm text-muted-foreground">Wells</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{selectedWorkingArea._count.seismicSurveys}</div>
+                    <div className="text-sm text-muted-foreground">Seismic Surveys</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{selectedWorkingArea._count.facilities}</div>
+                    <div className="text-sm text-muted-foreground">Facilities</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Dialog */}
+      <ImportDataDialog
+        open={showImportDialog}
+        onOpenChange={setShowImportDialog}
+      />
+
+      {/* Export Dialog */}
+      <ExportReportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+      />
+    </div>
+  );
+}

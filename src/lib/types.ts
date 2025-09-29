@@ -169,3 +169,89 @@ export type ProcessingLog = {
   message: string;
   level: 'Info' | 'Warning' | 'Error';
 };
+
+// Routing Services Types
+export type DataRoute = {
+  id: string;
+  providerId: string;
+  consumerId: string;
+  resourceId: string;
+  status: 'active' | 'inactive';
+  validUntil?: string | null;
+  createdAt: string;
+  provider: {
+    id: string;
+    name: string;
+    organization: string;
+  };
+  consumer: {
+    id: string;
+    name: string;
+    organization: string;
+  };
+  resource: {
+    id: string;
+    name: string;
+    type: string;
+    description: string;
+  };
+};
+
+export type DistributionLog = {
+  id: string;
+  routeId: string;
+  timestamp: string;
+  status: 'success' | 'error' | 'pending';
+  dataSize: string;
+  consumer: string;
+  errorMessage?: string;
+};
+
+export type RoutingService = {
+  id: string;
+  name: string;
+  description?: string;
+  routingType: 'ROUND_ROBIN' | 'WEIGHTED' | 'FAILOVER' | 'RANDOM';
+  priority: number;
+  loadBalancing: 'ROUND_ROBIN' | 'LEAST_CONNECTIONS' | 'IP_HASH' | 'WEIGHTED_ROUND_ROBIN';
+  healthCheck?: string;
+  status: 'active' | 'inactive' | 'error';
+  configuration?: any;
+  createdAt: string;
+  updatedAt: string;
+  endpoints?: RoutingEndpoint[];
+};
+
+export type RoutingEndpoint = {
+  id: string;
+  routingServiceId: string;
+  url: string;
+  weight: number;
+  status: 'active' | 'inactive' | 'unhealthy';
+  responseTime?: number;
+  lastCheck?: string;
+  createdAt: string;
+};
+
+// Dataspace Connector Types
+export type DataspaceConnector = {
+  id: string;
+  name: string;
+  connectorUrl: string;
+  version: string;
+  status: 'active' | 'inactive' | 'maintenance' | 'error';
+  securityProfile: {
+    encryption?: string;
+    authentication?: string;
+    [key: string]: any;
+  };
+  supportedFormats: string[];
+  capabilities: {
+    protocols?: string[];
+    maxFileSize?: string;
+    [key: string]: any;
+  };
+  registeredAt: string;
+  lastHealthCheck?: string;
+  metadata: Record<string, any>;
+};

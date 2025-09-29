@@ -6,6 +6,9 @@ import DataRequestManagement from '@/components/data-requests/DataRequestManagem
 import ResourceManagement from '@/components/configuration/ResourceManagement';
 import RouteManagement from '@/components/routes/RouteManagement';
 import NetworkSettings from '@/components/network/NetworkSettings';
+import ContainerManagement from '@/components/container-management/ContainerManagement';
+import DataSourceManagement from '@/components/data-sources/DataSourceManagement';
+import RegulatoryDataClearingHouse from '@/components/clearing-house/ClearingHouseTransactionManagement';
 import {
   Card,
   CardContent,
@@ -37,9 +40,10 @@ function PlaceholderTab({ title, description, content }: { title: string, descri
 export default function GuiPage() {
   const tabs = [
     { value: 'request-data', label: 'Permintaan Data (Consumer)' },
-    { value: 'resource-management', label: 'Manajemen Sumber Daya (Provider)' },
+    { value: 'resource-management', label: 'Vocabulary Provider' },
     { value: 'app-routes', label: 'Rute Data' },
-    { value: 'broker-management', label: 'Manajemen Broker' },
+    { value: 'broker-management', label: 'Metadata Broker' },
+    { value: 'clearing-house', label: 'Clearing House' },
     { value: 'network-settings', label: 'Pengaturan Jaringan' },
     { value: 'container-management', label: 'Manajemen Kontainer' },
     { value: 'configure-connector', label: 'Konfigurasi Konektor' },
@@ -74,25 +78,20 @@ export default function GuiPage() {
              <TabsContent value="broker-management">
               <BrokerManagement />
             </TabsContent>
+            <TabsContent value="clearing-house">
+              <RegulatoryDataClearingHouse />
+            </TabsContent>
             <TabsContent value="network-settings">
               <NetworkSettings />
             </TabsContent>
             <TabsContent value="container-management">
-              <PlaceholderTab 
-                title="Manajemen Kontainer" 
-                description="Kelola, monitor, dan operasikan kontainer Docker tempat konektor data berjalan."
-                content="UI untuk Start/Stop/Restart kontainer dan memonitor CPU, Memori, dan Log."
-              />
+              <ContainerManagement />
             </TabsContent>
             <TabsContent value="configure-connector">
               <ConfigManagement />
             </TabsContent>
             <TabsContent value="data-sources">
-              <PlaceholderTab 
-                title="Kelola Sumber Data"
-                description="Konfigurasi koneksi ke sumber data internal KKKS (misalnya: database, data lake)."
-                content="UI Manajemen Sumber Data Internal"
-               />
+              <DataSourceManagement />
             </TabsContent>
           </Tabs>
         </div>

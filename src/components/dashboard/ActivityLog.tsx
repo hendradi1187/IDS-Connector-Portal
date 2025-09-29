@@ -17,11 +17,9 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ActivityLog as ActivityLogType } from '@/lib/types';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '../ui/skeleton';
+import { useLanguage } from '@/context/LanguageContext';
 
 const statusVariants = {
   Success: 'default',
@@ -29,40 +27,72 @@ const statusVariants = {
   'In Progress': 'secondary',
 };
 
+interface ActivityLogData {
+  id: string;
+  user: {
+    name: string;
+    avatar?: string;
+  };
+  action: string;
+  details: string;
+  status: 'Success' | 'Failed' | 'In Progress';
+  timestamp: string;
+}
+
 export default function ActivityLog() {
-  const [logs, setLogs] = useState<ActivityLogType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const logsCollection = collection(db, 'activity-logs');
-    const q = query(logsCollection, orderBy('timestamp', 'desc'), limit(10));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const logsData: ActivityLogType[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        logsData.push({
-          id: doc.id,
-          user: data.user,
-          action: data.action,
-          details: data.details,
-          status: data.status,
-          timestamp: data.timestamp,
-        });
-      });
-      setLogs(logsData);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  // Mock activity log data with translations
+  const logs: ActivityLogData[] = [
+    {
+      id: '1',
+      user: { name: 'Admin KKKS', avatar: '' },
+      action: t('activity.new-resource'),
+      details: 'Seismic Data Blok X',
+      status: 'Success',
+      timestamp: '2 jam yang lalu'
+    },
+    {
+      id: '2',
+      user: { name: 'SKK Migas', avatar: '' },
+      action: t('activity.route-configured'),
+      details: 'Data exchange route untuk PT ABC',
+      status: 'Success',
+      timestamp: '4 jam yang lalu'
+    },
+    {
+      id: '3',
+      user: { name: 'User KKKS', avatar: '' },
+      action: t('activity.user-login'),
+      details: 'Login dari IP 192.168.1.100',
+      status: 'Success',
+      timestamp: '6 jam yang lalu'
+    },
+    {
+      id: '4',
+      user: { name: 'System', avatar: '' },
+      action: t('activity.data-sync'),
+      details: 'Sinkronisasi dengan broker IDS',
+      status: 'Success',
+      timestamp: '8 jam yang lalu'
+    },
+    {
+      id: '5',
+      user: { name: 'Admin', avatar: '' },
+      action: t('activity.system-update'),
+      details: 'Update konfigurasi keamanan',
+      status: 'In Progress',
+      timestamp: '1 hari yang lalu'
+    }
+  ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
+        <CardTitle>{t('activity.title')}</CardTitle>
         <CardDescription>
-          A log of recent activities within the system.
+          Log aktivitas terbaru dalam sistem.
         </CardDescription>
       </CardHeader>
       <CardContent>

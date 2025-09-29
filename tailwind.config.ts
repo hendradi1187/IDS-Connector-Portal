@@ -55,6 +55,16 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        // Industrial Energy & Migas Colors
+        'industrial-blue': 'hsl(var(--primary))',
+        'energy-green': 'hsl(var(--secondary))',
+        'migas-orange': 'hsl(var(--accent))',
+        'safety-red': 'hsl(var(--destructive))',
+        // Data Traffic Colors
+        'data-request': 'hsl(var(--data-request))',
+        'data-response': 'hsl(var(--data-response))',
+        'data-error': 'hsl(var(--data-error))',
+        'data-latency': 'hsl(var(--data-latency))',
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',

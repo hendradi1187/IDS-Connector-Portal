@@ -20,6 +20,8 @@ import {
   Network,
   Plug,
   Boxes,
+  Key,
+  CreditCard,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -27,6 +29,7 @@ import { usePathname } from 'next/navigation';
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/users', icon: Users, label: 'User Management' },
+  { href: '/license-management', icon: Key, label: 'License Management' },
   { href: '/gui', icon: Settings, label: 'GUI' },
   { href: '/data-management', icon: Database, label: 'Data Management' },
   { href: '/connector-controller', icon: Plug, label: 'Connector Controller' },

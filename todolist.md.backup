@@ -31,7 +31,7 @@ Ini adalah daftar tugas yang disesuaikan untuk pengembangan "IDS Connector Porta
 
 - [x] **GUI Operasional (100%)**
   - [x] Halaman utama dengan tab untuk semua fungsi operasional.
-  - [x] **Manajemen Sumber Daya (Provider)**: Formulir bagi KKKS untuk mendaftarkan metadata data (misal: Peta GeoJSON, Data Sumur) yang akan dibagikan.
+  - [x] **Vocabulary Provider**: Formulir bagi KKKS untuk mendaftarkan metadata data (misal: Peta GeoJSON, Data Sumur) yang akan dibagikan.
   - [x] **Permintaan Data (Consumer)**: Formulir bagi SKK Migas untuk membuat permintaan data dari KKKS.
   - [x] Implementasi CRUD untuk Broker, Rute Data, Konfigurasi, dan Jaringan.
   - [x] Placeholder informatif untuk "Manajemen Kontainer" dan "Sumber Data Eksternal".

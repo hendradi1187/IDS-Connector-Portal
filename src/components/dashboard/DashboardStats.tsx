@@ -6,11 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Plug, Route, AlertTriangle } from 'lucide-react';
+import { Plug, Route, AlertTriangle, Database, TrendingUp, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Skeleton } from '../ui/skeleton';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Stat = {
   id: string;
@@ -21,35 +20,52 @@ type Stat = {
 };
 
 const iconComponents: { [key: string]: React.ReactNode } = {
-  Plug: <Plug className="h-4 w-4 text-muted-foreground" />,
+  Database: <Database className="h-4 w-4 text-muted-foreground" />,
   Route: <Route className="h-4 w-4 text-muted-foreground" />,
-  AlertTriangle: <AlertTriangle className="h-4 w-4 text-muted-foreground" />,
+  TrendingUp: <TrendingUp className="h-4 w-4 text-muted-foreground" />,
+  Clock: <Clock className="h-4 w-4 text-muted-foreground" />,
 };
 
 export default function DashboardStats() {
-  const [stats, setStats] = useState<Stat[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'stats'), (snapshot) => {
-      const statsData: Stat[] = [];
-      snapshot.forEach((doc) => {
-        statsData.push({ id: doc.id, ...doc.data() } as Stat);
-      });
-      // Ensure a consistent order
-      const orderedTitles = ['Konektor KKKS Aktif', 'Rute Data', 'Kesalahan Terbaru'];
-      statsData.sort((a, b) => orderedTitles.indexOf(a.title) - orderedTitles.indexOf(b.title));
-      setStats(statsData);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  // Mock stats data with translations
+  const stats = [
+    {
+      id: '1',
+      title: t('stats.total-resources'),
+      value: '847',
+      change: '+12.5% dari bulan lalu',
+      icon: 'Database'
+    },
+    {
+      id: '2',
+      title: t('stats.active-routes'),
+      value: '156',
+      change: '+8 rute baru',
+      icon: 'Route'
+    },
+    {
+      id: '3',
+      title: t('stats.total-requests'),
+      value: '24,891',
+      change: '+1,204 hari ini',
+      icon: 'TrendingUp'
+    },
+    {
+      id: '4',
+      title: t('stats.system-uptime'),
+      value: '99.8%',
+      change: `45 ${t('stats.days')} uptime`,
+      icon: 'Clock'
+    }
+  ];
 
   if (loading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {[...Array(3)].map((_, i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
           <Card key={i}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <Skeleton className="h-4 w-2/4" />
@@ -66,7 +82,7 @@ export default function DashboardStats() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <Card key={stat.id}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
