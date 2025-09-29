@@ -31,6 +31,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 
 export default function Header() {
   const pathname = usePathname();
@@ -81,9 +83,11 @@ export default function Header() {
         <Input
           type="search"
           placeholder="Search..."
-          className="w-full rounded-lg bg-secondary pl-8 md:w-[200px] lg:w-[320px]"
+          className="w-full rounded-lg bg-background border-border pl-8 md:w-[200px] lg:w-[320px]"
         />
       </div>
+      <ThemeSwitcher variant="compact" showDescription={false} />
+      <LanguageSwitcher />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

@@ -1,0 +1,1981 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id          String   @id @default(uuid()) @db.Uuid
+  email       String   @unique
+  name        String
+  role        String   @default("user")
+  isActive    Boolean  @default(true)
+  lastLogin   DateTime?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  providedResources Resource[] @relation("ResourceProvider")
+  requests          Request[]   @relation("RequestRequester")
+  providerRequests  Request[]   @relation("RequestProvider")
+  routes            Route[]     @relation("RouteProvider")
+  consumerRoutes    Route[]     @relation("RouteConsumer")
+  networkSettings   NetworkSetting[]
+  containers        Container[]
+  serviceApplications ServiceApplication[] @relation("ServiceApplicationProvider")
+  providedContracts Contract[] @relation("ContractProvider")
+  consumedContracts Contract[] @relation("ContractConsumer")
+  systemLogs        SystemLog[] @relation("UserSystemLogs")
+  adaptorAuditLogs  AdaptorAuditLog[] @relation("UserAuditLogs")
+
+  // New audit trail relations
+  complianceAuditLogs   ComplianceAuditLog[] @relation("UserAuditTrail")
+  uploadAuditLogs       ResourceUploadAuditLog[] @relation("UserUploadAudit")
+  requestAuditPerformed RequestActionAuditLog[] @relation("RequestAuditPerformer")
+  requestAuditAuthorized RequestActionAuditLog[] @relation("RequestAuditAuthorizer")
+  requestAuditDelegated RequestActionAuditLog[] @relation("RequestAuditDelegate")
+
+  // License usage relations
+  licenseUsageLogs      LicenseUsageLog[] @relation("UserLicenseUsage")
+
+  // Regulatory Data Clearing House relations
+  submittedData         DataSubmissionRecord[] @relation("DataSubmitter")
+  receivedData          DataSubmissionRecord[] @relation("DataReceiver")
+  reviewedData          DataSubmissionRecord[] @relation("DataReviewer")
+  complianceValidations ComplianceValidation[] @relation("ComplianceValidator")
+  contractorTracking    ObligationTracking[] @relation("ContractorTracking")
+  issuedAcknowledgements DataAcknowledgement[] @relation("AcknowledgementIssuer")
+  approvedAcknowledgements DataAcknowledgement[] @relation("AcknowledgementApprover")
+  submissionAudits      SubmissionAuditLog[] @relation("SubmissionAuditor")
+
+  @@map("users")
+}
+
+// Requests
+model Request {
+  id          String      @id @default(uuid()) @db.Uuid @map("request_id")
+  requesterId String      @db.Uuid @map("requester_id")
+  providerId  String      @db.Uuid @map("provider_id")
+  resourceId  String      @db.Uuid @map("resource_id")
+  requestType RequestType @map("request_type")
+  status      RequestStatus @default(pending)
+  purpose     String?
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  requester User     @relation("RequestRequester", fields: [requesterId], references: [id])
+  provider  User     @relation("RequestProvider", fields: [providerId], references: [id])
+  resource  Resource @relation(fields: [resourceId], references: [id])
+  brokers   Broker[]
+  processingLogs ProcessingLog[] @relation("RequestProcessing")
+
+  // New audit trail relations
+  requestActionAuditLogs RequestActionAuditLog[] @relation("RequestActionAudit")
+
+  @@index([status, createdAt])
+  @@index([providerId, status])
+  @@index([requesterId, status])
+  @@map("requests")
+}
+
+// Resources
+model Resource {
+  id           String       @id @default(uuid()) @db.Uuid @map("resource_id")
+  providerId   String       @db.Uuid @map("provider_id")
+  name         String       @db.VarChar(255)
+  description  String?
+  type         ResourceType
+  storagePath  String?      @map("storage_path")
+  metadata     Json?        @db.JsonB
+  accessPolicy AccessPolicy @default(restricted) @map("access_policy")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  provider User      @relation("ResourceProvider", fields: [providerId], references: [id])
+  requests Request[]
+  routes   Route[]
+  contracts Contract[] @relation("ResourceContracts")
+  processingLogs ProcessingLog[] @relation("ResourceProcessing")
+  submissions DataSubmissionRecord[] @relation("SubmissionResource")
+
+  // New audit trail relations
+  complianceAuditLogs ComplianceAuditLog[] @relation("ResourceAuditTrail")
+  uploadAuditLogs ResourceUploadAuditLog[] @relation("ResourceUploadAudit")
+
+  @@index([providerId, type])
+  @@index([type, accessPolicy])
+  @@index([providerId, accessPolicy])
+  @@map("resources")
+}
+
+// Routes
+model Route {
+  id         String    @id @default(uuid()) @db.Uuid @map("route_id")
+  providerId String    @db.Uuid @map("provider_id")
+  consumerId String    @db.Uuid @map("consumer_id")
+  resourceId String    @db.Uuid @map("resource_id")
+  status     RouteStatus @default(active)
+  validUntil DateTime? @map("valid_until")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  provider User     @relation("RouteProvider", fields: [providerId], references: [id])
+  consumer User     @relation("RouteConsumer", fields: [consumerId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
+
+  @@index([status, validUntil])
+  @@index([providerId, status])
+  @@index([consumerId, status])
+  @@map("routes")
+}
+
+// Brokers
+model Broker {
+  id               String           @id @default(uuid()) @db.Uuid @map("broker_id")
+  transactionId    String           @db.Uuid @map("transaction_id")
+  requestId        String           @db.Uuid @map("request_id")
+  validationStatus ValidationStatus @default(pending) @map("validation_status")
+  notes            String?
+  timestamp        DateTime         @default(now())
+
+  // Relations
+  request Request @relation(fields: [requestId], references: [id])
+
+  @@map("brokers")
+}
+
+// Network Settings
+model NetworkSetting {
+  id          String          @id @default(uuid()) @db.Uuid @map("setting_id")
+  providerId  String          @db.Uuid @map("provider_id")
+  apiEndpoint String?         @map("api_endpoint")
+  protocol    NetworkProtocol
+  status      NetworkStatus   @default(active)
+  lastChecked DateTime        @default(now()) @map("last_checked")
+
+  // Relations
+  provider User @relation(fields: [providerId], references: [id])
+
+  @@map("network_settings")
+}
+
+// Containers
+model Container {
+  id          String          @id @default(uuid()) @db.Uuid @map("container_id")
+  serviceName String          @db.VarChar(100) @map("service_name")
+  providerId  String          @db.Uuid @map("provider_id")
+  status      ContainerStatus @default(stopped)
+  image       String?
+  ports       Json?
+  volumes     Json?
+  environment Json?
+  cpuUsage    Float?          @map("cpu_usage")
+  memoryUsage Float?          @map("memory_usage")
+  logs        String?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  provider User @relation(fields: [providerId], references: [id])
+
+  @@map("containers")
+}
+
+// Data Sources Models
+model DataSource {
+  id               String     @id @default(uuid()) @db.Uuid
+  name             String
+  type             String
+  host             String
+  port             Int?
+  database         String?
+  username         String?
+  password         String?
+  schema           String?
+  table            String?
+  query            String?
+  connectionString String?    @map("connection_string")
+  status           String     @default("inactive")
+  lastSync         DateTime?  @map("last_sync")
+  metadata         Json?      @db.JsonB
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+
+  @@map("data_sources")
+}
+
+// Configuration
+model Config {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  value       String
+  description String?
+  category    String?
+  type        String   @default("string")
+  isSecret    Boolean  @default(false) @map("is_secret")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("configs")
+}
+
+// Enums
+enum RequestType {
+  GeoJSON
+  Seismic
+  Production
+}
+
+enum RequestStatus {
+  pending
+  approved
+  rejected
+  delivered
+}
+
+enum ResourceType {
+  GeoJSON
+  CSV
+  WellData @map("Well Data")
+}
+
+enum AccessPolicy {
+  restricted
+  public
+  contractOnly @map("contract-only")
+}
+
+enum RouteStatus {
+  active
+  inactive
+}
+
+enum ValidationStatus {
+  pending
+  approved
+  rejected
+}
+
+enum NetworkProtocol {
+  HTTPS
+  VPN
+  IDSBroker @map("IDS Broker")
+}
+
+enum NetworkStatus {
+  active
+  inactive
+}
+
+enum ContainerStatus {
+  running
+  stopped
+  error
+  starting
+  stopping
+}
+
+// Service Applications Models
+model ServiceApplication {
+  id          String                    @id @default(uuid()) @db.Uuid @map("service_id")
+  name        String                    @db.VarChar(100)
+  description String?
+  version     String                    @db.VarChar(50)
+  providerId  String                    @db.Uuid @map("provider_id")
+  status      ServiceApplicationStatus  @default(inactive)
+  endpoint    String?
+  healthCheck String?                   @map("health_check")
+  apiKey      String?                   @map("api_key")
+  metadata    Json?                     @db.JsonB
+  lastCheck   DateTime?                 @map("last_check")
+  createdAt   DateTime                  @default(now()) @map("created_at")
+  updatedAt   DateTime                  @updatedAt @map("updated_at")
+
+  // Relations
+  provider User @relation("ServiceApplicationProvider", fields: [providerId], references: [id])
+  contracts Contract[] @relation("ServiceApplicationContracts")
+
+  @@map("service_applications")
+}
+
+// Contracts Models
+model Contract {
+  id                    String         @id @default(uuid()) @db.Uuid @map("contract_id")
+  title                 String         @db.VarChar(255)
+  description           String?
+  providerId            String         @db.Uuid @map("provider_id")
+  consumerId            String         @db.Uuid @map("consumer_id")
+  serviceApplicationId  String?        @db.Uuid @map("service_application_id")
+  resourceId            String?        @db.Uuid @map("resource_id")
+  status                ContractStatus @default(draft)
+  contractType          KKKSContractType   @map("contract_type")
+  terms                 Json?          @db.JsonB
+  validFrom             DateTime       @map("valid_from")
+  validUntil            DateTime       @map("valid_until")
+  signedAt              DateTime?      @map("signed_at")
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  provider           User               @relation("ContractProvider", fields: [providerId], references: [id])
+  consumer           User               @relation("ContractConsumer", fields: [consumerId], references: [id])
+  serviceApplication ServiceApplication? @relation("ServiceApplicationContracts", fields: [serviceApplicationId], references: [id])
+  resource           Resource?          @relation("ResourceContracts", fields: [resourceId], references: [id])
+
+  // New audit trail relations
+  complianceAuditLogs ComplianceAuditLog[] @relation("ContractAuditTrail")
+  uploadAuditLogs ResourceUploadAuditLog[] @relation("ContractUploadAudit")
+  requestAuditLogs RequestActionAuditLog[] @relation("ContractRequestAudit")
+
+  @@map("contracts")
+}
+
+// Backend System Monitoring Models
+model SystemLog {
+  id        String        @id @default(uuid()) @db.Uuid @map("log_id")
+  service   String        @db.VarChar(100)
+  level     LogLevel
+  message   String
+  details   Json?         @db.JsonB
+  userId    String?       @db.Uuid @map("user_id")
+  timestamp DateTime      @default(now())
+
+  // Relations
+  user User? @relation("UserSystemLogs", fields: [userId], references: [id])
+
+  @@index([service, level, timestamp])
+  @@map("system_logs")
+}
+
+model ApiStatus {
+  id           String           @id @default(uuid()) @db.Uuid @map("status_id")
+  serviceName  String           @db.VarChar(100) @map("service_name")
+  endpoint     String
+  status       ApiStatusType    @default(unknown)
+  responseTime Int?             @map("response_time") // milliseconds
+  statusCode   Int?             @map("status_code")
+  errorMessage String?          @map("error_message")
+  lastChecked  DateTime         @default(now()) @map("last_checked")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  @@index([serviceName, status])
+  @@map("api_statuses")
+}
+
+model ProcessingLog {
+  id           String              @id @default(uuid()) @db.Uuid @map("processing_id")
+  processType  String              @db.VarChar(100) @map("process_type")
+  resourceId   String?             @db.Uuid @map("resource_id")
+  requestId    String?             @db.Uuid @map("request_id")
+  status       ProcessingStatus    @default(pending)
+  startTime    DateTime            @map("start_time")
+  endTime      DateTime?           @map("end_time")
+  duration     Int?                // seconds
+  progress     Int                 @default(0) // percentage 0-100
+  details      Json?               @db.JsonB
+  errorMessage String?             @map("error_message")
+
+  // Relations
+  resource Resource? @relation("ResourceProcessing", fields: [resourceId], references: [id])
+  request  Request?  @relation("RequestProcessing", fields: [requestId], references: [id])
+
+  @@index([processType, status])
+  @@map("processing_logs")
+}
+
+// External Services Models
+model ExternalService {
+  id              String                @id @default(uuid()) @db.Uuid @map("external_service_id")
+  name            String                @db.VarChar(100)
+  description     String?
+  serviceType     ExternalServiceType   @map("service_type")
+  endpoint        String
+  authType        AuthenticationType    @map("auth_type")
+  credentials     Json?                 @db.JsonB // encrypted
+  status          ExternalServiceStatus @default(inactive)
+  lastSync        DateTime?             @map("last_sync")
+  syncInterval    Int?                  @map("sync_interval") // minutes
+  metadata        Json?                 @db.JsonB
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+
+  // Relations
+  syncLogs   AdaptorSyncLog[]  @relation
+  auditLogs  AdaptorAuditLog[] @relation
+
+  @@index([serviceType, status])
+  @@index([status, lastSync])
+  @@index([authType])
+  @@map("external_services")
+}
+
+// OGC-OSDU Adaptor Models
+model AdaptorSyncLog {
+  id               String            @id @default(uuid()) @db.Uuid @map("sync_log_id")
+  externalServiceId String           @db.Uuid @map("external_service_id")
+  syncType         AdaptorSyncType   @map("sync_type")
+  status           SyncStatus        @default(in_progress)
+  startedAt        DateTime          @default(now()) @map("started_at")
+  completedAt      DateTime?         @map("completed_at")
+  recordsProcessed Int               @default(0) @map("records_processed")
+  errors           Json?             @db.JsonB
+  metadata         Json?             @db.JsonB
+
+  // Relations
+  externalService ExternalService @relation(fields: [externalServiceId], references: [id], onDelete: Cascade)
+
+  @@index([externalServiceId, startedAt])
+  @@index([status, syncType])
+  @@map("adaptor_sync_logs")
+}
+
+model AdaptorAuditLog {
+  id               String         @id @default(uuid()) @db.Uuid @map("audit_log_id")
+  externalServiceId String        @db.Uuid @map("external_service_id")
+  userId           String?        @db.Uuid @map("user_id")
+  action           String         @db.VarChar(100)
+  endpoint         String
+  requestMethod    String         @db.VarChar(10) @map("request_method")
+  requestParams    Json?          @db.JsonB @map("request_params")
+  responseStatus   Int            @map("response_status")
+  responseTime     Int?           @map("response_time") // milliseconds
+  userAgent        String?        @map("user_agent")
+  ipAddress        String?        @map("ip_address")
+  timestamp        DateTime       @default(now())
+
+  // Relations
+  externalService ExternalService @relation(fields: [externalServiceId], references: [id], onDelete: Cascade)
+  user            User?           @relation("UserAuditLogs", fields: [userId], references: [id])
+
+  @@index([externalServiceId, timestamp])
+  @@index([userId, timestamp])
+  @@index([action, timestamp])
+  @@map("adaptor_audit_logs")
+}
+
+// Dataspace Connector Models
+model DataspaceConnector {
+  id               String                     @id @default(uuid()) @db.Uuid @map("connector_id")
+  name             String                     @db.VarChar(100)
+  description      String?
+  connectorUrl     String                     @map("connector_url")
+  version          String                     @db.VarChar(50)
+  status           DataspaceConnectorStatus   @default(offline)
+  registrationId   String?                    @map("registration_id")
+  securityProfile  String?                    @map("security_profile")
+  supportedFormats Json?                      @db.JsonB @map("supported_formats")
+  capabilities     Json?                      @db.JsonB
+  lastHeartbeat    DateTime?                  @map("last_heartbeat")
+  createdAt        DateTime                   @default(now()) @map("created_at")
+  updatedAt        DateTime                   @updatedAt @map("updated_at")
+
+  @@map("dataspace_connectors")
+}
+
+// Routing Services Models
+model RoutingService {
+  id              String              @id @default(uuid()) @db.Uuid @map("routing_service_id")
+  name            String              @db.VarChar(100)
+  description     String?
+  routingType     RoutingType         @map("routing_type")
+  priority        Int                 @default(0)
+  loadBalancing   LoadBalancingType   @map("load_balancing")
+  healthCheck     String?             @map("health_check")
+  status          RoutingServiceStatus @default(inactive)
+  configuration   Json?               @db.JsonB
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  endpoints RoutingEndpoint[]
+
+  @@map("routing_services")
+}
+
+model RoutingEndpoint {
+  id               String           @id @default(uuid()) @db.Uuid @map("endpoint_id")
+  routingServiceId String           @db.Uuid @map("routing_service_id")
+  url              String
+  weight           Int              @default(1)
+  status           EndpointStatus   @default(active)
+  responseTime     Int?             @map("response_time") // milliseconds
+  lastCheck        DateTime?        @map("last_check")
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  routingService RoutingService @relation(fields: [routingServiceId], references: [id], onDelete: Cascade)
+
+  @@map("routing_endpoints")
+}
+
+// Connector Controller Models
+model ConnectorController {
+  id                  String                    @id @default(uuid()) @db.Uuid @map("controller_id")
+  name                String                    @db.VarChar(100)
+  description         String?
+  controllerType      ConnectorControllerType   @map("controller_type")
+  status              ConnectorControllerStatus @default(inactive)
+  ipAddress           String?                   @map("ip_address")
+  port                Int?
+  version             String?                   @db.VarChar(50)
+  capabilities        Json?                     @db.JsonB
+  configuration       Json?                     @db.JsonB
+  lastCommunication   DateTime?                 @map("last_communication")
+  createdAt           DateTime                  @default(now()) @map("created_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+
+  // Relations
+  metrics ConnectorMetric[]
+
+  @@map("connector_controllers")
+}
+
+model ConnectorMetric {
+  id                   String              @id @default(uuid()) @db.Uuid @map("metric_id")
+  connectorControllerId String             @db.Uuid @map("connector_controller_id")
+  metricType           ConnectorMetricType @map("metric_type")
+  value                Float
+  unit                 String?             @db.VarChar(20)
+  timestamp            DateTime            @default(now())
+
+  // Relations
+  connectorController ConnectorController @relation(fields: [connectorControllerId], references: [id], onDelete: Cascade)
+
+  @@index([connectorControllerId, metricType, timestamp])
+  @@map("connector_metrics")
+}
+
+// Additional Enums
+enum ServiceApplicationStatus {
+  active
+  inactive
+  maintenance
+  error
+}
+
+enum ContractStatus {
+  draft
+  pending
+  active
+  expired
+  terminated
+  rejected
+}
+
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  FATAL
+}
+
+enum ApiStatusType {
+  healthy
+  degraded
+  unhealthy
+  unknown
+}
+
+enum ProcessingStatus {
+  pending
+  running
+  completed
+  failed
+  cancelled
+}
+
+enum ExternalServiceType {
+  IDS_BROKER
+  DATA_CATALOG
+  AUTHENTICATION
+  MONITORING
+  ANALYTICS
+  OGC_OSDU_ADAPTOR
+  DATA_PROVIDER
+  METADATA_BROKER
+}
+
+enum AuthenticationType {
+  API_KEY
+  OAUTH2
+  BASIC_AUTH
+  CERTIFICATE
+  OIDC
+  PKI
+  OIDC_PKI
+  NONE
+}
+
+enum ExternalServiceStatus {
+  active
+  inactive
+  error
+  syncing
+}
+
+enum AdaptorSyncType {
+  METADATA
+  SEISMIC_DATA
+  WELL_LOGS
+  RESERVOIR_DATA
+  FULL_SYNC
+  INCREMENTAL
+}
+
+enum SyncStatus {
+  in_progress
+  completed
+  failed
+  cancelled
+}
+
+enum DataspaceConnectorStatus {
+  online
+  offline
+  synchronizing
+  error
+}
+
+enum RoutingType {
+  ROUND_ROBIN
+  WEIGHTED
+  FAILOVER
+  RANDOM
+}
+
+enum LoadBalancingType {
+  ROUND_ROBIN
+  LEAST_CONNECTIONS
+  IP_HASH
+  WEIGHTED_ROUND_ROBIN
+}
+
+enum RoutingServiceStatus {
+  active
+  inactive
+  error
+}
+
+enum EndpointStatus {
+  active
+  inactive
+  unhealthy
+}
+
+enum ConnectorControllerType {
+  IDS_CONNECTOR
+  DATA_PROCESSOR
+  BROKER_INTERFACE
+  SECURITY_GATEWAY
+}
+
+enum ConnectorControllerStatus {
+  active
+  inactive
+  error
+  maintenance
+}
+
+enum ConnectorMetricType {
+  CPU_USAGE
+  MEMORY_USAGE
+  DISK_USAGE
+  NETWORK_IN
+  NETWORK_OUT
+  REQUEST_COUNT
+  ERROR_RATE
+  RESPONSE_TIME
+}
+
+// Comprehensive Audit Trail Models for Migas Compliance
+model ComplianceAuditLog {
+  id                String         @id @default(uuid()) @db.Uuid @map("audit_id")
+
+  // Core audit fields
+  eventType         AuditEventType @map("event_type")
+  action            String         @db.VarChar(100)
+  entityType        String         @map("entity_type") @db.VarChar(50)
+  entityId          String?        @map("entity_id") @db.VarChar(255)
+
+  // User and session tracking
+  userId            String?        @db.Uuid @map("user_id")
+  sessionId         String?        @map("session_id") @db.VarChar(255)
+  userAgent         String?        @map("user_agent")
+  ipAddress         String?        @map("ip_address") @db.VarChar(45)
+
+  // Request details
+  requestMethod     String?        @map("request_method") @db.VarChar(10)
+  requestPath       String?        @map("request_path") @db.VarChar(500)
+  requestParams     Json?          @map("request_params") @db.JsonB
+  responseStatus    Int?           @map("response_status")
+
+  // Resource and data details
+  resourceType      ResourceType?  @map("resource_type")
+  resourceId        String?        @db.Uuid @map("resource_id")
+  dataClassification DataClassification? @map("data_classification")
+  fileSize          BigInt?        @map("file_size")
+  fileName          String?        @map("file_name") @db.VarChar(255)
+  filePath          String?        @map("file_path") @db.VarChar(1000)
+  fileHash          String?        @map("file_hash") @db.VarChar(128)
+
+  // Security and compliance
+  securityLevel     SecurityLevel  @default(PUBLIC) @map("security_level")
+  complianceFlags   String[]       @map("compliance_flags")
+  riskScore         Int?           @map("risk_score") // 0-100
+
+  // Business context
+  contractId        String?        @db.Uuid @map("contract_id")
+  projectCode       String?        @map("project_code") @db.VarChar(50)
+  businessUnit      String?        @map("business_unit") @db.VarChar(100)
+
+  // Change tracking for immutability
+  previousState     Json?          @map("previous_state") @db.JsonB
+  currentState      Json?          @map("current_state") @db.JsonB
+  changeReason      String?        @map("change_reason")
+
+  // Metadata and additional details
+  metadata          Json?          @db.JsonB
+  errorDetails      Json?          @map("error_details") @db.JsonB
+
+  // Immutable timestamp and integrity
+  timestamp         DateTime       @default(now())
+  createdAt         DateTime       @default(now()) @map("created_at")
+  integrityHash     String         @map("integrity_hash") @db.VarChar(128)
+
+  // Relations
+  user              User?          @relation("UserAuditTrail", fields: [userId], references: [id])
+  resource          Resource?      @relation("ResourceAuditTrail", fields: [resourceId], references: [id])
+  contract          Contract?      @relation("ContractAuditTrail", fields: [contractId], references: [id])
+
+  @@index([eventType, timestamp])
+  @@index([userId, timestamp])
+  @@index([entityType, entityId])
+  @@index([resourceId, timestamp])
+  @@index([contractId, timestamp])
+  @@index([securityLevel, timestamp])
+  @@index([integrityHash])
+  @@map("compliance_audit_logs")
+}
+
+// Resource Upload Specific Audit Trail
+model ResourceUploadAuditLog {
+  id                  String             @id @default(uuid()) @db.Uuid @map("upload_audit_id")
+
+  // Upload details
+  resourceId          String             @db.Uuid @map("resource_id")
+  originalFileName    String             @map("original_file_name") @db.VarChar(255)
+  uploadedFileName    String             @map("uploaded_file_name") @db.VarChar(255)
+  fileSize            BigInt             @map("file_size")
+  fileType            String             @map("file_type") @db.VarChar(100)
+  mimeType            String             @map("mime_type") @db.VarChar(100)
+
+  // Security and integrity
+  fileHash            String             @map("file_hash") @db.VarChar(128)
+  virusScanStatus     VirusScanStatus    @map("virus_scan_status")
+  encryptionStatus    EncryptionStatus   @map("encryption_status")
+
+  // Upload process
+  uploadStatus        UploadStatus       @map("upload_status")
+  uploadProgress      Int                @default(0) @map("upload_progress") // 0-100
+  uploadStartTime     DateTime           @map("upload_start_time")
+  uploadEndTime       DateTime?          @map("upload_end_time")
+
+  // User and location
+  userId              String             @db.Uuid @map("user_id")
+  ipAddress           String             @map("ip_address") @db.VarChar(45)
+  userAgent           String?            @map("user_agent")
+  location            String?            @db.VarChar(255)
+
+  // Validation and compliance
+  validationStatus    ValidationStatus   @map("validation_status")
+  validationErrors    Json?              @map("validation_errors") @db.JsonB
+  complianceChecks    Json               @map("compliance_checks") @db.JsonB
+  dataClassification  DataClassification @map("data_classification")
+
+  // Metadata and context
+  businessJustification String?          @map("business_justification")
+  projectCode         String?            @map("project_code") @db.VarChar(50)
+  contractId          String?            @db.Uuid @map("contract_id")
+
+  // Immutable audit fields
+  timestamp           DateTime           @default(now())
+  integrityHash       String             @map("integrity_hash") @db.VarChar(128)
+
+  // Relations
+  user                User               @relation("UserUploadAudit", fields: [userId], references: [id])
+  resource            Resource           @relation("ResourceUploadAudit", fields: [resourceId], references: [id])
+  contract            Contract?          @relation("ContractUploadAudit", fields: [contractId], references: [id])
+
+  @@index([resourceId, timestamp])
+  @@index([userId, timestamp])
+  @@index([uploadStatus, timestamp])
+  @@index([dataClassification, timestamp])
+  @@index([integrityHash])
+  @@map("resource_upload_audit_logs")
+}
+
+// Request Action Audit Trail
+model RequestActionAuditLog {
+  id                String               @id @default(uuid()) @db.Uuid @map("request_audit_id")
+
+  // Request details
+  requestId         String               @db.Uuid @map("request_id")
+  actionType        RequestActionType    @map("action_type")
+  actionStatus      RequestActionStatus  @map("action_status")
+
+  // User and authority
+  performedByUserId String               @db.Uuid @map("performed_by_user_id")
+  authorizedByUserId String?             @db.Uuid @map("authorized_by_user_id")
+  delegateUserId    String?              @db.Uuid @map("delegate_user_id")
+
+  // Request state changes
+  previousStatus    RequestStatus?       @map("previous_status")
+  newStatus         RequestStatus?       @map("new_status")
+  statusReason      String?              @map("status_reason")
+
+  // Approval workflow
+  approvalLevel     Int?                 @map("approval_level")
+  requiredApprovals Int?                 @map("required_approvals")
+  currentApprovals  Int?                 @map("current_approvals")
+
+  // Data access details
+  dataRequested     Json?                @map("data_requested") @db.JsonB
+  accessGranted     Json?                @map("access_granted") @db.JsonB
+  accessConditions  Json?                @map("access_conditions") @db.JsonB
+  dataDeliveryMethod String?             @map("data_delivery_method") @db.VarChar(100)
+
+  // Security and compliance
+  securityClearance SecurityLevel        @map("security_clearance")
+  complianceNotes   String?              @map("compliance_notes")
+  riskAssessment    Json?                @map("risk_assessment") @db.JsonB
+
+  // Business context
+  businessJustification String?          @map("business_justification")
+  projectCode       String?              @map("project_code") @db.VarChar(50)
+  contractId        String?              @db.Uuid @map("contract_id")
+  costCenter        String?              @map("cost_center") @db.VarChar(50)
+
+  // Technical details
+  ipAddress         String               @map("ip_address") @db.VarChar(45)
+  userAgent         String?              @map("user_agent")
+  sessionId         String?              @map("session_id") @db.VarChar(255)
+  requestMetadata   Json?                @map("request_metadata") @db.JsonB
+
+  // Immutable audit fields
+  timestamp         DateTime             @default(now())
+  integrityHash     String               @map("integrity_hash") @db.VarChar(128)
+
+  // Relations
+  performedBy       User                 @relation("RequestAuditPerformer", fields: [performedByUserId], references: [id])
+  authorizedBy      User?                @relation("RequestAuditAuthorizer", fields: [authorizedByUserId], references: [id])
+  delegate          User?                @relation("RequestAuditDelegate", fields: [delegateUserId], references: [id])
+  request           Request              @relation("RequestActionAudit", fields: [requestId], references: [id])
+  contract          Contract?            @relation("ContractRequestAudit", fields: [contractId], references: [id])
+
+  @@index([requestId, timestamp])
+  @@index([performedByUserId, timestamp])
+  @@index([actionType, timestamp])
+  @@index([actionStatus, timestamp])
+  @@index([securityClearance, timestamp])
+  @@index([integrityHash])
+  @@map("request_action_audit_logs")
+}
+
+// New Enums for Audit Trail
+enum AuditEventType {
+  RESOURCE_UPLOAD
+  RESOURCE_DOWNLOAD
+  RESOURCE_ACCESS
+  RESOURCE_MODIFICATION
+  RESOURCE_DELETION
+  REQUEST_SUBMITTED
+  REQUEST_APPROVED
+  REQUEST_REJECTED
+  REQUEST_DELIVERED
+  USER_LOGIN
+  USER_LOGOUT
+  USER_PERMISSION_CHANGE
+  SYSTEM_CONFIGURATION
+  DATA_EXPORT
+  SECURITY_INCIDENT
+  COMPLIANCE_VIOLATION
+  CONTRACT_CREATED
+  CONTRACT_MODIFIED
+  CONTRACT_TERMINATED
+}
+
+enum DataClassification {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  RESTRICTED
+  TOP_SECRET
+}
+
+enum SecurityLevel {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  SECRET
+  TOP_SECRET
+}
+
+enum VirusScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  QUARANTINED
+  SCAN_FAILED
+}
+
+enum EncryptionStatus {
+  NOT_ENCRYPTED
+  ENCRYPTED_AT_REST
+  ENCRYPTED_IN_TRANSIT
+  FULLY_ENCRYPTED
+}
+
+enum UploadStatus {
+  INITIATED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
+  QUARANTINED
+}
+
+enum RequestActionType {
+  SUBMIT
+  REVIEW
+  APPROVE
+  REJECT
+  MODIFY
+  CANCEL
+  DELIVER
+  ACKNOWLEDGE
+  ESCALATE
+}
+
+enum RequestActionStatus {
+  SUCCESS
+  FAILED
+  PENDING
+  PARTIAL
+  CANCELLED
+}
+
+// License Management Models
+model License {
+  id                String            @id @default(uuid()) @db.Uuid @map("license_id")
+
+  // License Token Information
+  licenseToken      String            @unique @map("license_token")
+  licenseHash       String            @map("license_hash") @db.VarChar(128)
+
+  // License Details
+  licenseName       String            @map("license_name") @db.VarChar(255)
+  licenseType       LicenseType       @map("license_type")
+  licenseLevel      LicenseLevel      @map("license_level")
+
+  // Validity Period
+  issuedDate        DateTime          @map("issued_date")
+  activationDate    DateTime?         @map("activation_date")
+  expirationDate    DateTime          @map("expiration_date")
+
+  // License Status
+  status            LicenseStatus     @default(INACTIVE)
+  isActive          Boolean           @default(false) @map("is_active")
+
+  // Organization Information
+  organizationName  String            @map("organization_name") @db.VarChar(255)
+  organizationId    String?           @map("organization_id") @db.VarChar(100)
+  contactEmail      String            @map("contact_email")
+
+  // License Limits
+  maxUsers          Int?              @map("max_users")
+  maxConnectors     Int?              @map("max_connectors")
+  maxDataVolume     BigInt?           @map("max_data_volume") // in bytes
+  maxAPIRequests    Int?              @map("max_api_requests") // per day
+
+  // Features Access
+  enabledFeatures   String[]          @map("enabled_features")
+  restrictedFeatures String[]         @map("restricted_features")
+
+  // Security
+  activationKey     String?           @map("activation_key") @db.VarChar(512)
+  clientFingerprint String?           @map("client_fingerprint") @db.VarChar(255)
+
+  // Hardware Lock (optional)
+  hardwareLock      Json?             @map("hardware_lock") @db.JsonB
+
+  // Usage Tracking
+  lastUsed          DateTime?         @map("last_used")
+  usageCount        Int               @default(0) @map("usage_count")
+
+  // Metadata
+  metadata          Json?             @db.JsonB
+  notes             String?
+
+  // Audit Trail
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  usageLogs         LicenseUsageLog[] @relation("LicenseUsageLogs")
+
+  @@index([licenseToken])
+  @@index([status, expirationDate])
+  @@index([organizationId])
+  @@map("licenses")
+}
+
+model LicenseUsageLog {
+  id                String          @id @default(uuid()) @db.Uuid @map("usage_id")
+
+  // License Reference
+  licenseId         String          @db.Uuid @map("license_id")
+
+  // Usage Details
+  featureUsed       String          @map("feature_used") @db.VarChar(100)
+  usageType         LicenseUsageType @map("usage_type")
+
+  // User and Session
+  userId            String?         @db.Uuid @map("user_id")
+  sessionId         String?         @map("session_id") @db.VarChar(255)
+  ipAddress         String?         @map("ip_address") @db.VarChar(45)
+  userAgent         String?         @map("user_agent")
+
+  // Usage Metrics
+  dataProcessed     BigInt?         @map("data_processed") // bytes
+  apiCalls          Int?            @map("api_calls")
+  processingTime    Int?            @map("processing_time") // milliseconds
+
+  // Status and Results
+  usageStatus       UsageStatus     @map("usage_status")
+  errorMessage      String?         @map("error_message")
+
+  // Metadata
+  metadata          Json?           @db.JsonB
+
+  // Timestamps
+  startTime         DateTime        @map("start_time")
+  endTime           DateTime?       @map("end_time")
+  timestamp         DateTime        @default(now())
+
+  // Relations
+  license           License         @relation("LicenseUsageLogs", fields: [licenseId], references: [id], onDelete: Cascade)
+  user              User?           @relation("UserLicenseUsage", fields: [userId], references: [id])
+
+  @@index([licenseId, timestamp])
+  @@index([featureUsed, timestamp])
+  @@index([userId, timestamp])
+  @@map("license_usage_logs")
+}
+
+// License Management Enums
+enum LicenseType {
+  TRIAL
+  STANDARD
+  PROFESSIONAL
+  ENTERPRISE
+  GOVERNMENT
+  ACADEMIC
+}
+
+enum LicenseLevel {
+  BASIC
+  ADVANCED
+  PREMIUM
+  UNLIMITED
+}
+
+enum LicenseStatus {
+  INACTIVE
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  REVOKED
+  PENDING_ACTIVATION
+}
+
+enum LicenseUsageType {
+  FEATURE_ACCESS
+  DATA_PROCESSING
+  API_CALL
+  USER_SESSION
+  CONNECTOR_USAGE
+  REPORT_GENERATION
+}
+
+enum UsageStatus {
+  SUCCESS
+  FAILED
+  PARTIAL
+  RATE_LIMITED
+  FEATURE_RESTRICTED
+}
+
+// Regulatory Data Clearing House Models
+model DataSubmissionRecord {
+  id                String                    @id @default(uuid()) @db.Uuid @map("submission_id")
+
+  // Submission Basics
+  submissionType    DataSubmissionType        @map("submission_type")
+  status           SubmissionStatus          @default(SUBMITTED)
+  priority         SubmissionPriority        @default(NORMAL)
+
+  // Parties Involved (KKKS to SKK Migas context)
+  submitterId      String                    @db.Uuid @map("submitter_id") // KKKS
+  receiverId       String                    @db.Uuid @map("receiver_id")   // SKK Migas
+  reviewerId       String?                   @db.Uuid @map("reviewer_id")   // SKK Migas reviewer
+
+  // Related Entities
+  contractorWorkArea String?                 @map("contractor_work_area") @db.VarChar(100) // Wilayah Kerja
+  obligationId     String?                   @db.Uuid @map("obligation_id") // Kewajiban terkait
+  resourceId       String?                   @db.Uuid @map("resource_id")   // Data resource
+  reportingPeriod  String?                   @map("reporting_period") @db.VarChar(50) // Q1 2024, Jan 2024, dll
+
+  // Submission Details
+  submissionData   Json                      @db.JsonB @map("submission_data")
+  dataMetadata     Json?                     @db.JsonB @map("data_metadata")
+  attachments      Json?                     @db.JsonB // File paths, sizes, checksums
+
+  // Regulatory Context
+  regulationType   RegulationType            @map("regulation_type")
+  complianceLevel  ComplianceLevel           @default(STANDARD) @map("compliance_level")
+  obligationStatus ObligationStatus          @default(PENDING) @map("obligation_status")
+
+  // Validation Requirements
+  requiredValidations Int                    @default(1) @map("required_validations")
+  currentValidations  Int                    @default(0) @map("current_validations")
+  autoValidation   Boolean                   @default(false) @map("auto_validation")
+
+  // Timeline
+  submittedAt      DateTime                  @default(now()) @map("submitted_at")
+  dueDate          DateTime?                 @map("due_date")
+  reviewedAt       DateTime?                 @map("reviewed_at")
+  acknowledgedAt   DateTime?                 @map("acknowledged_at")
+
+  // Metadata
+  metadata         Json?                     @db.JsonB
+  errorDetails     Json?                     @db.JsonB @map("error_details")
+  correctionNotes  String?                   @map("correction_notes")
+
+  // Relations
+  submitter        User                      @relation("DataSubmitter", fields: [submitterId], references: [id])
+  receiver         User                      @relation("DataReceiver", fields: [receiverId], references: [id])
+  reviewer         User?                     @relation("DataReviewer", fields: [reviewerId], references: [id])
+  obligation       RegulatoryObligation?     @relation("SubmissionObligation", fields: [obligationId], references: [id])
+  resource         Resource?                 @relation("SubmissionResource", fields: [resourceId], references: [id])
+
+  // Child Relations
+  validations      ComplianceValidation[]    @relation("SubmissionValidations")
+  acknowledgements DataAcknowledgement[]     @relation("SubmissionAcknowledgements")
+  auditLogs        SubmissionAuditLog[]      @relation("SubmissionAuditLogs")
+  obligationTracking ObligationTracking[]    @relation("SubmissionObligations")
+
+  @@index([status, submittedAt])
+  @@index([submissionType, status])
+  @@index([submitterId, status])
+  @@index([receiverId, status])
+  @@index([priority, status])
+  @@index([dueDate, status])
+  @@index([contractorWorkArea, reportingPeriod])
+  @@map("data_submission_records")
+}
+
+model ComplianceValidation {
+  id               String                    @id @default(uuid()) @db.Uuid @map("validation_id")
+
+  // Submission Reference
+  submissionId     String                    @db.Uuid @map("submission_id")
+
+  // Validation Details
+  validationType   ComplianceCheckType       @map("validation_type")
+  validatorRole    ValidatorRole             @map("validator_role")
+  validatorId      String                    @db.Uuid @map("validator_id")
+
+  // Validation Results
+  status           ValidationResult          @default(PENDING)
+  complianceScore  Int?                      @map("compliance_score") // 0-100
+  completenessScore Int?                     @map("completeness_score") // 0-100
+
+  // Validation Criteria
+  validationCriteria Json                    @db.JsonB @map("validation_criteria")
+  checkResults     Json                      @db.JsonB @map("check_results")
+  failedChecks     String[]                  @map("failed_checks")
+
+  // Decision Details
+  decision         ValidationDecision?
+  reasoning        String?
+  correctionRequired String[]               @map("correction_required")
+  recommendations  String?
+
+  // Timestamps
+  initiatedAt      DateTime                  @default(now()) @map("initiated_at")
+  completedAt      DateTime?                 @map("completed_at")
+  expiresAt        DateTime?                 @map("expires_at")
+
+  // Relations
+  submission       DataSubmissionRecord      @relation("SubmissionValidations", fields: [submissionId], references: [id], onDelete: Cascade)
+  validator        User                      @relation("ComplianceValidator", fields: [validatorId], references: [id])
+
+  @@index([submissionId, status])
+  @@index([validatorId, status])
+  @@index([validationType, status])
+  @@index([decision, completedAt])
+  @@map("compliance_validations")
+}
+
+model RegulatoryObligation {
+  id               String                    @id @default(uuid()) @db.Uuid @map("obligation_id")
+
+  // Obligation Basics
+  obligationType   ObligationType            @map("obligation_type")
+  obligationCode   String                    @map("obligation_code") @db.VarChar(50) // e.g., "PROD-MONTHLY", "SEISMIC-ANNUAL"
+  title           String                     @db.VarChar(255)
+  description     String?
+
+  // Regulatory Context
+  regulationType   RegulationType            @map("regulation_type")
+  legalBasis      String?                    @map("legal_basis") @db.VarChar(255) // UU, Permen, SK, dll
+  effectiveDate   DateTime                   @map("effective_date")
+  expiryDate      DateTime?                  @map("expiry_date")
+
+  // Obligation Requirements
+  frequency       ObligationFrequency
+  dataTypes       String[]                   @map("data_types") // seismic, production, financial, dll
+  requiredFields  Json                       @db.JsonB @map("required_fields")
+  templates       Json?                      @db.JsonB // Template references
+
+  // Enforcement
+  mandatoryFor    String[]                   @map("mandatory_for") // KKKS types: "konvensional", "non-konvensional", "all"
+  penaltyClause   String?                    @map("penalty_clause")
+  gracePeriod     Int?                       @map("grace_period") // days
+
+  // Status
+  status          ObligationStatus           @default(ACTIVE)
+  isActive        Boolean                    @default(true) @map("is_active")
+
+  // Metadata
+  metadata        Json?                      @db.JsonB
+  createdAt       DateTime                   @default(now()) @map("created_at")
+  updatedAt       DateTime                   @updatedAt @map("updated_at")
+
+  // Relations
+  submissions     DataSubmissionRecord[]     @relation("SubmissionObligation")
+  tracking        ObligationTracking[]       @relation("TrackedObligation")
+
+  @@index([obligationType, status])
+  @@index([regulationType, effectiveDate])
+  @@index([frequency, isActive])
+  @@unique([obligationCode])
+  @@map("regulatory_obligations")
+}
+
+model ObligationTracking {
+  id               String                    @id @default(uuid()) @db.Uuid @map("tracking_id")
+
+  // References
+  submissionId     String                    @db.Uuid @map("submission_id")
+  obligationId     String                    @db.Uuid @map("obligation_id")
+  contractorId     String                    @db.Uuid @map("contractor_id") // KKKS
+
+  // Tracking Details
+  reportingPeriod  String                    @map("reporting_period") @db.VarChar(50) // "2024-Q1", "2024-01"
+  dueDate          DateTime                  @map("due_date")
+  status           TrackingStatus            @default(PENDING)
+
+  // Compliance Status
+  isOverdue        Boolean                   @default(false) @map("is_overdue")
+  daysPastDue      Int?                      @map("days_past_due")
+  remindersSent    Int                       @default(0) @map("reminders_sent")
+
+  // Resolution
+  completedAt      DateTime?                 @map("completed_at")
+  waived           Boolean                   @default(false)
+  waivedReason     String?                   @map("waived_reason")
+  penaltyApplied   Boolean                   @default(false) @map("penalty_applied")
+
+  // Notes
+  notes            String?
+  internalNotes    String?                   @map("internal_notes")
+
+  // Timestamps
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  updatedAt        DateTime                  @updatedAt @map("updated_at")
+
+  // Relations
+  submission       DataSubmissionRecord      @relation("SubmissionObligations", fields: [submissionId], references: [id])
+  obligation       RegulatoryObligation      @relation("TrackedObligation", fields: [obligationId], references: [id])
+  contractor       User                      @relation("ContractorTracking", fields: [contractorId], references: [id])
+
+  @@index([obligationId, reportingPeriod])
+  @@index([contractorId, status])
+  @@index([dueDate, status])
+  @@index([isOverdue, daysPastDue])
+  @@map("obligation_tracking")
+}
+
+model DataAcknowledgement {
+  id               String                    @id @default(uuid()) @db.Uuid @map("acknowledgement_id")
+
+  // Submission Reference
+  submissionId     String                    @db.Uuid @map("submission_id")
+
+  // Acknowledgement Details
+  acknowledgementType AcknowledgementType    @map("acknowledgement_type")
+  status           AcknowledgementStatus     @default(PENDING)
+
+  // Issuing Authority
+  issuedBy         String                    @db.Uuid @map("issued_by") // SKK Migas officer
+  approvedBy       String?                   @db.Uuid @map("approved_by") // Senior officer
+  department       String?                   @map("department") @db.VarChar(100)
+
+  // Acknowledgement Content
+  acknowledgementNumber String               @unique @map("acknowledgement_number") @db.VarChar(50)
+  title            String                    @db.VarChar(255)
+  content          String?                   // Acknowledgement letter content
+
+  // Legal Context
+  legalBasis       String?                   @map("legal_basis") @db.VarChar(255)
+  referenceNumber  String?                   @map("reference_number") @db.VarChar(100)
+
+  // Digital Signature & Verification
+  digitalSignature String?                   @map("digital_signature") @db.Text
+  signatureHash    String?                   @map("signature_hash") @db.VarChar(128)
+  verificationCode String?                   @map("verification_code") @db.VarChar(50)
+
+  // Validity
+  validFrom        DateTime                  @map("valid_from")
+  validUntil       DateTime?                 @map("valid_until")
+  isRevocable      Boolean                   @default(true) @map("is_revocable")
+
+  // Distribution
+  recipientEmails  String[]                  @map("recipient_emails")
+  distributedAt    DateTime?                 @map("distributed_at")
+
+  // Metadata
+  metadata         Json?                     @db.JsonB
+  attachments      Json?                     @db.JsonB // Certificate files, official stamps
+
+  // Timestamps
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  issuedAt         DateTime?                 @map("issued_at")
+  revokedAt        DateTime?                 @map("revoked_at")
+
+  // Relations
+  submission       DataSubmissionRecord      @relation("SubmissionAcknowledgements", fields: [submissionId], references: [id], onDelete: Cascade)
+  issuer           User                      @relation("AcknowledgementIssuer", fields: [issuedBy], references: [id])
+  approver         User?                     @relation("AcknowledgementApprover", fields: [approvedBy], references: [id])
+
+  @@index([submissionId, status])
+  @@index([issuedBy, status])
+  @@index([acknowledgementType, issuedAt])
+  @@index([validFrom, validUntil])
+  @@map("data_acknowledgements")
+}
+
+model SubmissionAuditLog {
+  id               String                    @id @default(uuid()) @db.Uuid @map("audit_id")
+
+  // Submission Reference
+  submissionId     String                    @db.Uuid @map("submission_id")
+
+  // Event Details
+  eventType        SubmissionEventType       @map("event_type")
+  eventDescription String                    @map("event_description")
+
+  // Actor Information
+  actorUserId      String?                   @db.Uuid @map("actor_user_id")
+  actorRole        String?                   @map("actor_role") @db.VarChar(50)
+  actorOrganization String?                  @map("actor_organization") @db.VarChar(100) // KKKS name or SKK Migas
+  actorIpAddress   String?                   @map("actor_ip_address") @db.VarChar(45)
+
+  // State Changes
+  previousState    Json?                     @db.JsonB @map("previous_state")
+  newState         Json?                     @db.JsonB @map("new_state")
+  changedFields    String[]                  @map("changed_fields")
+
+  // Regulatory Context
+  regulatoryContext Json?                    @db.JsonB @map("regulatory_context")
+  complianceNotes  String?                   @map("compliance_notes")
+
+  // Additional Context
+  metadata         Json?                     @db.JsonB
+  errorDetails     Json?                     @db.JsonB @map("error_details")
+
+  // Security & Integrity
+  integrityHash    String                    @map("integrity_hash") @db.VarChar(128)
+  immutableRecord  Boolean                   @default(true) @map("immutable_record")
+
+  // Timestamp
+  timestamp        DateTime                  @default(now())
+
+  // Relations
+  submission       DataSubmissionRecord      @relation("SubmissionAuditLogs", fields: [submissionId], references: [id], onDelete: Cascade)
+  actor            User?                     @relation("SubmissionAuditor", fields: [actorUserId], references: [id])
+
+  @@index([submissionId, timestamp])
+  @@index([eventType, timestamp])
+  @@index([actorUserId, timestamp])
+  @@index([actorOrganization, timestamp])
+  @@map("submission_audit_logs")
+}
+
+// Regulatory Data Clearing House Enums
+enum DataSubmissionType {
+  SEISMIC_DATA
+  WELL_LOG_DATA
+  PRODUCTION_DATA
+  FINANCIAL_REPORT
+  ENVIRONMENTAL_REPORT
+  SAFETY_REPORT
+  DRILLING_REPORT
+  COMPLETION_REPORT
+  GEOLOGICAL_REPORT
+  GEOPHYSICAL_REPORT
+  ANNUAL_WORK_PROGRAM
+  QUARTERLY_PROGRESS
+  MONTHLY_PRODUCTION
+  DAILY_DRILLING
+  INCIDENT_REPORT
+  COMPLIANCE_CERTIFICATE
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  PENDING_VALIDATION
+  VALIDATING
+  APPROVED
+  REJECTED
+  REVISION_REQUIRED
+  ACKNOWLEDGED
+  ARCHIVED
+  OVERDUE
+  CANCELLED
+}
+
+enum SubmissionPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+  CRITICAL
+}
+
+enum RegulationType {
+  GOVERNMENT_REGULATION
+  MINISTERIAL_REGULATION
+  DIRECTORATE_GUIDELINE
+  SKK_MIGAS_PROCEDURE
+  INDUSTRY_STANDARD
+  ENVIRONMENTAL_STANDARD
+  SAFETY_STANDARD
+  TECHNICAL_GUIDELINE
+}
+
+enum ComplianceLevel {
+  BASIC
+  STANDARD
+  ENHANCED
+  STRICT
+  REGULATORY
+}
+
+enum ComplianceCheckType {
+  MANUAL_REVIEW
+  AUTOMATED_CHECK
+  FORMAT_VALIDATION
+  COMPLETENESS_CHECK
+  TECHNICAL_REVIEW
+  REGULATORY_COMPLIANCE
+  DATA_QUALITY_CHECK
+  METADATA_VALIDATION
+}
+
+enum ValidatorRole {
+  KKKS
+  SKK_MIGAS_REVIEWER
+  SKK_MIGAS_APPROVER
+  TECHNICAL_EXPERT
+  REGULATOR
+  AUDITOR
+  SYSTEM
+}
+
+enum ValidationResult {
+  PENDING
+  APPROVED
+  REJECTED
+  CONDITIONAL
+  REVISION_REQUIRED
+  ESCALATED
+  EXPIRED
+}
+
+enum ValidationDecision {
+  APPROVE
+  REJECT
+  CONDITIONAL_APPROVE
+  REQUEST_REVISION
+  REQUEST_MORE_INFO
+  ESCALATE
+}
+
+enum ObligationType {
+  REPORTING_OBLIGATION
+  DATA_SUBMISSION
+  COMPLIANCE_CERTIFICATE
+  ENVIRONMENTAL_CLEARANCE
+  SAFETY_COMPLIANCE
+  FINANCIAL_GUARANTEE
+  TECHNICAL_APPROVAL
+  WORK_PROGRAM_APPROVAL
+}
+
+enum ObligationFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  SEMI_ANNUALLY
+  ANNUALLY
+  BIANNUALLY
+  AD_HOC
+  ONE_TIME
+}
+
+enum ObligationStatus {
+  ACTIVE
+  PENDING
+  FULFILLED
+  OVERDUE
+  WAIVED
+  SUSPENDED
+  CANCELLED
+}
+
+enum TrackingStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  COMPLETED
+  OVERDUE
+  WAIVED
+}
+
+enum AcknowledgementType {
+  RECEIPT_CONFIRMATION
+  APPROVAL_CERTIFICATE
+  COMPLIANCE_CERTIFICATE
+  COMPLETION_CERTIFICATE
+  WAIVER_LETTER
+  PENALTY_NOTICE
+  REMINDER_NOTICE
+}
+
+enum AcknowledgementStatus {
+  PENDING
+  ISSUED
+  DISTRIBUTED
+  REVOKED
+  EXPIRED
+}
+
+enum SubmissionEventType {
+  SUBMISSION_CREATED
+  SUBMISSION_UPLOADED
+  VALIDATION_REQUESTED
+  VALIDATION_COMPLETED
+  REVISION_REQUESTED
+  REVISION_SUBMITTED
+  APPROVAL_GRANTED
+  ACKNOWLEDGEMENT_ISSUED
+  SUBMISSION_ARCHIVED
+  OBLIGATION_TRACKED
+  REMINDER_SENT
+  PENALTY_APPLIED
+  STATUS_CHANGED
+  ERROR_OCCURRED
+}
+
+// =============================================================================
+// MDM HULU MIGAS - SKK MIGAS DATA SPECIFICATION v2
+// =============================================================================
+
+// Working Area (Wilayah Kerja) Models
+model WorkingArea {
+  id                      String   @id @default(uuid()) @db.Uuid
+  wkId                    String   @unique @map("wk_id") @db.VarChar(50) // WK_ID (mandatory, unique)
+  namaWk                  String   @map("nama_wk") @db.VarChar(255) // NAMA_WK
+  statusWk                WorkingAreaStatus @map("status_wk") // STATUS_WK
+  provinsi1               String?  @map("provinsi_1") @db.VarChar(100) // PROVINSI_1
+  provinsi2               String?  @map("provinsi_2") @db.VarChar(100) // PROVINSI_2
+  lokasi                  LocationType @map("lokasi") // LOKASI (Onshore/Offshore/Onshore-Offshore)
+  jenisKontrak            KKKSContractType @map("jenis_kontrak") // JENIS_KONTRAK (PSC/Gross Split)
+  effectiveDate           DateTime @map("effective_date") // EFFECTIVE_DATE
+  expireDate              DateTime? @map("expire_date") // EXPIRE_DATE
+  holding                 String   @map("holding") @db.VarChar(255) // HOLDING (Operator/KKKS)
+  faseWk                  WorkingAreaPhase @map("fase_wk") // FASE_WK (Eksplorasi/Produksi)
+  luasWkAwal              Float?   @map("luas_wk_awal") // LUAS_WK_AWAL (km²)
+  luasWk                  Float?   @map("luas_wk") // LUAS_WK (km²)
+  namaCekungan            String?  @map("nama_cekungan") @db.VarChar(255) // NAMA_CEKUNGAN
+  statusCekungan          String?  @map("status_cekungan") @db.VarChar(100) // STATUS_CEKUNGAN
+  participatingInterest   Float?   @map("participating_interest") // PARTICIPATING_INTEREST (%)
+  kewenangan              AuthorityType @map("kewenangan") // KEWENANGAN (SKK Migas/BPMA)
+  attachment              Json?    @db.JsonB // ATTACHMENT (dokumen kontrak/PSC)
+  shape                   Json     @db.JsonB // SHAPE (geometry polygon, WGS 84)
+  crsEpsg                 Int      @default(4326) @map("crs_epsg") // CRS EPSG (default WGS 84)
+
+  // Audit fields
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+  createdBy               String?  @map("created_by") @db.Uuid
+  updatedBy               String?  @map("updated_by") @db.Uuid
+
+  // Relations
+  fields                  Field[] @relation("FieldWorkingArea")
+  wells                   Well[] @relation("WellWorkingArea")
+  seismicSurveys          SeismicSurvey[] @relation("SeismicWorkingArea")
+  facilities              Facility[] @relation("FacilityWorkingArea")
+
+  @@index([wkId])
+  @@index([statusWk, faseWk])
+  @@index([lokasi, jenisKontrak])
+  @@map("working_areas")
+}
+
+// Seismic Survey Models
+model SeismicSurvey {
+  id                      String   @id @default(uuid()) @db.Uuid
+  seisAcqtnSurveyId       String   @unique @map("seis_acqtn_survey_id") @db.VarChar(50) // SEIS_ACQTN_SURVEY_ID
+  acqtnSurveyName         String   @map("acqtn_survey_name") @db.VarChar(255) // ACQTN_SURVEY_NAME
+  baLongName              String   @map("ba_long_name") @db.VarChar(255) // BA_LONG_NAME (KKKS)
+  wkId                    String   @map("wk_id") @db.VarChar(50) // WK_ID
+  projectId               String?  @map("project_id") @db.VarChar(100) // PROJECT_ID
+  projectLevel            String?  @map("project_level") @db.VarChar(100) // PROJECT_LEVEL
+  startDate               DateTime? @map("start_date") // START_DATE
+  completedDate           DateTime? @map("completed_date") // COMPLETED_DATE
+  shotBy                  String?  @map("shot_by") @db.VarChar(255) // SHOT_BY (Perusahaan akuisisi)
+  seisDimension           SeismicDimension @map("seis_dimension") // SEIS_DIMENSION (2D/3D)
+  environment             SeismicEnvironment @map("environment") // ENVIRONMENT (Marine/Land/Transition)
+  seisLineType            SeismicLineType @map("seis_line_type") // SEIS_LINE_TYPE
+  crsRemark               String   @default("WGS 84, EPSG:4326") @map("crs_remark") @db.VarChar(255) // CRS_REMARK
+  shape                   Json     @db.JsonB // SHAPE (point/polyline, WGS 84)
+  shapeArea               Float?   @map("shape_area") // SHAPE_AREA (for polygons)
+  shapeLength             Float?   @map("shape_length") // SHAPE_LENGTH (for lines)
+  crsEpsg                 Int      @default(4326) @map("crs_epsg") // CRS EPSG
+
+  // Additional fields
+  dataQuality             String?  @map("data_quality") @db.VarChar(100)
+  processingStatus        String?  @map("processing_status") @db.VarChar(100)
+
+  // Audit fields
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+  createdBy               String?  @map("created_by") @db.Uuid
+  updatedBy               String?  @map("updated_by") @db.Uuid
+
+  // Relations
+  workingArea             WorkingArea @relation("SeismicWorkingArea", fields: [wkId], references: [wkId])
+
+  @@index([seisAcqtnSurveyId])
+  @@index([wkId, seisDimension])
+  @@index([environment, startDate])
+  @@map("seismic_surveys")
+}
+
+
+// Well Models
+model Well {
+  id                      String   @id @default(uuid()) @db.Uuid
+  uwi                     String   @unique @map("uwi") @db.VarChar(50) // UWI (Unique Well Identifier, mandatory)
+  wkId                    String   @map("wk_id") @db.VarChar(50) // WK_ID
+  fieldId                 String?  @map("field_id") @db.VarChar(50) // FIELD_ID
+  wellName                String   @map("well_name") @db.VarChar(255) // WELL_NAME
+  operator                String   @map("operator") @db.VarChar(255) // OPERATOR (KKKS)
+  currentClass            WellClass @map("current_class") // CURRENT_CLASS (Exploration/Development)
+  statusType              WellStatus @map("status_type") // STATUS_TYPE
+  environmentType         WellEnvironment @map("environment_type") // ENVIRONMENT_TYPE
+  profileType             WellProfile @map("profile_type") // PROFILE_TYPE
+  spudDate                DateTime? @map("spud_date") // SPUD_DATE
+  finalDrillDate          DateTime? @map("final_drill_date") // FINAL_DRILL_DATE
+  surfaceLongitude        Float    @map("surface_longitude") // SURFACE_LONGITUDE (EPSG 4326)
+  surfaceLatitude         Float    @map("surface_latitude") // SURFACE_LATITUDE (EPSG 4326)
+  nsUtm                   Float?   @map("ns_utm") // NS_UTM
+  ewUtm                   Float?   @map("ew_utm") // EW_UTM
+  utmEpsg                 Int?     @map("utm_epsg") // UTM_EPSG
+  shape                   Json     @db.JsonB // SHAPE (point geometry)
+
+  // Additional technical fields
+  totalDepth              Float?   @map("total_depth") // Total Depth (m)
+  waterDepth              Float?   @map("water_depth") // Water Depth (m)
+  kellyBushingElevation   Float?   @map("kb_elevation") // KB Elevation (m)
+
+  // Audit fields
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+  createdBy               String?  @map("created_by") @db.Uuid
+  updatedBy               String?  @map("updated_by") @db.Uuid
+
+  // Relations
+  workingArea             WorkingArea @relation("WellWorkingArea", fields: [wkId], references: [wkId])
+  field                   Field? @relation("FieldWells", fields: [fieldId], references: [fieldId])
+  facilities              WellFacility[] @relation("WellFacilities")
+
+  @@index([uwi])
+  @@index([wkId, currentClass])
+  @@index([fieldId, statusType])
+  @@index([operator, environmentType])
+  @@map("wells")
+}
+
+// Field Models
+model Field {
+  id                      String   @id @default(uuid()) @db.Uuid
+  fieldId                 String   @unique @map("field_id") @db.VarChar(50) // FIELD_ID (unique)
+  fieldName               String   @map("field_name") @db.VarChar(255) // FIELD_NAME
+  wkId                    String   @map("wk_id") @db.VarChar(50) // WK_ID
+  basin                   String?  @map("basin") @db.VarChar(255) // BASIN
+  formationName           String?  @map("formation_name") @db.VarChar(255) // FORMATION_NAME
+  discoveryDate           DateTime? @map("discovery_date") // DISCOVERY_DATE
+  fieldType               FieldType @map("field_type") // FIELD_TYPE (Oil/Gas/Oil-Gas/Non-Production)
+  status                  FieldStatus @map("status") // STATUS (Active/Abandoned)
+  operator                String   @map("operator") @db.VarChar(255) // OPERATOR (KKKS)
+  isOffshore              Boolean  @map("is_offshore") // IS_OFFSHORE
+  shape                   Json     @db.JsonB // SHAPE (polygon, WGS 84)
+
+  // Additional fields
+  reservoirType           String?  @map("reservoir_type") @db.VarChar(100)
+  estimatedReserves       Float?   @map("estimated_reserves") // MMSTB or BSCF
+  currentProduction       Float?   @map("current_production") // BOPD or MMSCFD
+
+  // Audit fields
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+  createdBy               String?  @map("created_by") @db.Uuid
+  updatedBy               String?  @map("updated_by") @db.Uuid
+
+  // Relations
+  workingArea             WorkingArea @relation("FieldWorkingArea", fields: [wkId], references: [wkId])
+  wells                   Well[] @relation("FieldWells")
+  facilities              Facility[] @relation("FacilityField")
+
+  @@index([fieldId])
+  @@index([wkId, fieldType])
+  @@index([status, operator])
+  @@index([isOffshore, basin])
+  @@map("fields")
+}
+
+
+// Facility Models
+model Facility {
+  id                      String   @id @default(uuid()) @db.Uuid
+  facilityId              String   @unique @map("facility_id") @db.VarChar(50) // FACILITY_ID
+  facilityName            String   @map("facility_name") @db.VarChar(255)
+  facilityType            FacilityType @map("facility_type") // Type of facility
+  subType                 String?  @map("sub_type") @db.VarChar(100) // Sub-type within category
+  wkId                    String   @map("wk_id") @db.VarChar(50) // WK_ID
+  fieldId                 String?  @map("field_id") @db.VarChar(50) // FIELD_ID (optional)
+  operator                String   @map("operator") @db.VarChar(255) // OPERATOR
+  status                  FacilityStatus @map("status") // STATUS
+  installationDate        DateTime? @map("installation_date")
+  commissioningDate       DateTime? @map("commissioning_date")
+
+  // Pipeline specific fields
+  diameter                Float?   @map("diameter") // DIAMETER (inches)
+  length                  Float?   @map("length") // LENGTH (km)
+  fluidType               String?  @map("fluid_type") @db.VarChar(100) // FLUID_TYPE
+
+  // Platform specific fields
+  capacityProd            Float?   @map("capacity_prod") // CAPACITY_PROD
+  waterDepth              Float?   @map("water_depth") // WATER_DEPTH (m)
+  noOfWell                Int?     @map("no_of_well") // NO_OF_WELL
+
+  // Floating facility specific fields
+  vesselCapacity          Float?   @map("vessel_capacity") // VESSEL_CAPACITY
+
+  // Processing plant specific fields
+  storageCapacity         Float?   @map("storage_capacity") // STORAGE_CAPACITY
+  plantCapacity           Float?   @map("plant_capacity") // PLANT_CAPACITY
+  power                   Float?   @map("power") // POWER (MW)
+
+  // Geometry
+  shape                   Json     @db.JsonB // SHAPE (point/polygon/polyline per layer)
+  crsEpsg                 Int      @default(4326) @map("crs_epsg") // CRS EPSG
+
+  // Audit fields
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+  createdBy               String?  @map("created_by") @db.Uuid
+  updatedBy               String?  @map("updated_by") @db.Uuid
+
+  // Relations
+  workingArea             WorkingArea @relation("FacilityWorkingArea", fields: [wkId], references: [wkId])
+  field                   Field? @relation("FacilityField", fields: [fieldId], references: [fieldId])
+  wellFacilities          WellFacility[] @relation("FacilityWells")
+
+  @@index([facilityId])
+  @@index([wkId, facilityType])
+  @@index([fieldId, status])
+  @@index([operator, facilityType])
+  @@map("facilities")
+}
+
+// Junction table for Well-Facility relationships
+model WellFacility {
+  id         String   @id @default(uuid()) @db.Uuid
+  wellId     String   @map("well_id") @db.Uuid
+  facilityId String   @map("facility_id") @db.Uuid
+
+  well       Well     @relation("WellFacilities", fields: [wellId], references: [id])
+  facility   Facility @relation("FacilityWells", fields: [facilityId], references: [id])
+
+  @@unique([wellId, facilityId])
+  @@map("well_facilities")
+}
+
+// =============================================================================
+// ENUMS FOR MDM HULU MIGAS
+// =============================================================================
+
+enum WorkingAreaStatus {
+  AKTIF
+  TERMINASI
+  SUSPENSI
+  RELINQUISH
+  EXPIRED
+}
+
+enum LocationType {
+  ONSHORE
+  OFFSHORE
+  ONSHORE_OFFSHORE
+}
+
+enum KKKSContractType {
+  PSC
+  GROSS_SPLIT
+  TAC
+  SERVICE_CONTRACT
+}
+
+enum WorkingAreaPhase {
+  EKSPLORASI
+  PRODUKSI
+  DEVELOPMENT
+  ABANDONMENT
+}
+
+enum AuthorityType {
+  SKK_MIGAS
+  BPMA
+  PUSAT
+  DAERAH
+}
+
+enum SeismicDimension {
+  TWO_D
+  THREE_D
+  FOUR_D
+}
+
+enum SeismicEnvironment {
+  MARINE
+  LAND
+  TRANSITION
+}
+
+enum SeismicLineType {
+  SHOT_POINT
+  RECEIVER_POINT
+  CMP
+  BIN
+  SAIL_LINE
+}
+
+enum WellClass {
+  EXPLORATION
+  DEVELOPMENT
+  INJECTION
+  OBSERVATION
+  STRATIGRAPHIC
+}
+
+enum WellStatus {
+  PRODUCE
+  INJECT
+  SUSPENDED
+  ABANDONED
+  DRILLING
+  PLANNED
+}
+
+enum WellEnvironment {
+  LAND
+  MARINE
+  TRANSITION
+}
+
+enum WellProfile {
+  VERTICAL
+  HORIZONTAL
+  DIRECTIONAL
+  MULTILATERAL
+}
+
+enum FieldType {
+  OIL
+  GAS
+  OIL_GAS
+  NON_PRODUCTION
+  CONDENSATE
+}
+
+enum FieldStatus {
+  ACTIVE
+  ABANDONED
+  SUSPENDED
+  DEVELOPMENT
+  DISCOVERY
+}
+
+enum FacilityType {
+  PIPELINE
+  PLATFORM
+  FLOATING_FACILITY
+  CUSTODY_TRANSFER
+  PROCESSING_PLANT
+  STORAGE_TANK
+  CABLE
+  OTHER_FACILITIES
+}
+
+enum FacilityStatus {
+  OPERATIONAL
+  UNDER_CONSTRUCTION
+  PLANNED
+  SUSPENDED
+  DECOMMISSIONED
+  ABANDONED
+}
+

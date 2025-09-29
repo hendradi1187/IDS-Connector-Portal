@@ -1,71 +1,115 @@
-# Daftar Tugas Pengembangan Portal Konektor IDS
+# Daftar Tugas: Portal Konektor Data Hulu Migas (KKKS & SKK Migas)
 
-Ini adalah daftar tugas untuk melacak kemajuan pengembangan "IDS Connector Portal".
+Ini adalah daftar tugas yang disesuaikan untuk pengembangan "IDS Connector Portal" dalam konteks industri hulu migas Indonesia, dengan KKKS sebagai penyedia data dan SKK Migas sebagai konsumen.
 
-**Kemajuan Keseluruhan: 95%**
+**Kemajuan Keseluruhan: 85%**
 
 ---
 
 ### Modul & Fitur
 
-- [x] **Konfigurasi Proyek & Otentikasi (100%)**
+- [x] **Konfigurasi & Otentikasi (100%)**
   - [x] Inisialisasi proyek Next.js.
   - [x] Konfigurasi Firebase (Hosting, Firestore, Authentication).
-  - [x] Implementasi alur login dengan Email & Password.
-  - [x] Manajemen peran pengguna (admin, operator, viewer).
+  - [x] Implementasi alur login (email/password) untuk staf KKKS dan SKK Migas.
+  - [x] Manajemen peran (Admin, Operator, Viewer) untuk mengatur hak akses.
 
-- [x] **Tata Letak Utama (100%)**
-  - [x] Buat desain dashboard desktop.
-  - [x] Implementasi Sidebar di sebelah kiri.
-  - [x] Tambahkan menu navigasi ke Sidebar.
+- [x] **Tata Letak & Navigasi (100%)**
+  - [x] Desain dashboard utama untuk monitoring.
+  - [x] Implementasi Sidebar dengan menu navigasi yang relevan untuk hulu migas.
   - [x] Pastikan perutean berfungsi untuk semua item menu.
 
 - [x] **Dashboard (100%)**
-  - [x] Tiga kartu ringkasan (Konektor Aktif, Rute Data, Kesalahan).
-  - [x] Grafik garis untuk lalu lintas data (data dummy).
-  - [x] Tabel untuk 10 log aktivitas terbaru (data dummy).
-  - [x] Hubungkan komponen log aktivitas ke data Firestore langsung.
-  - [x] Hubungkan kartu ringkasan & grafik ke data Firestore.
+  - [x] Tampilkan ringkasan: jumlah konektor KKKS aktif, total rute data, dan kesalahan terbaru.
+  - [x] Grafik real-time untuk lalu lintas data (permintaan dari SKK Migas vs. respons dari KKKS).
+  - [x] Log aktivitas terbaru (misal: "KKKS A menambahkan data GeoJSON baru", "SKK Migas meminta data Blok X").
 
 - [x] **Manajemen Pengguna (100%)**
-  - [x] Buat halaman Manajemen Pengguna dengan tab filter peran.
-  - [x] Tampilkan tabel pengguna dengan data dummy.
-  - [x] Hubungkan ke koleksi "users" di Firestore.
-  - [x] Buat fungsionalitas CRUD (Create, Read, Update, Delete) untuk pengguna.
+  - [x] Halaman untuk mengelola akun pengguna (staf KKKS & SKK Migas).
+  - [x] Fungsionalitas CRUD untuk menambah, mengedit, dan menghapus pengguna.
+  - [x] Filter pengguna berdasarkan peran (Admin, Operator, Viewer).
 
-- [x] **GUI (95%)**
-  - [x] Buat halaman GUI dengan struktur tab yang benar.
-  - [x] Implementasikan Formulir & Tabel untuk setiap tab (Resources, Routes, Brokers, Network, Configs, Data Requests).
-  - [x] Hubungkan setiap tab ke koleksi Firestore yang sesuai.
-  - [ ] Implementasikan fungsionalitas "Container Management" dan "Data Sources".
+- [ ] **GUI Operasional (90%)**
+  - [x] Halaman utama dengan tab untuk semua fungsi operasional.
+  - [ ] **Vocabulary Provider (75%)**: Formulir bagi KKKS untuk mendaftarkan metadata data MDM Hulu Migas
+    - [x] Working Area Management - CRUD operations
+    - [x] Seismic Survey Management - CRUD operations
+    - [x] Well Management - CRUD operations
+    - [x] Field Management - CRUD operations
+    - [x] Facility Management - CRUD operations
+    - [x] Validation Dashboard - Data validation tools
+    - [ ] **Fitur yang belum selesai 100%:**
+      - [ ] Real-time Statistics Dashboard - saat ini menampilkan nilai 0 (tidak terintegrasi dengan API)
+      - [ ] Import Data functionality - tombol tidak memiliki implementasi
+      - [ ] Export Report functionality - tombol tidak memiliki implementasi
+      - [ ] Settings functionality - tombol tidak memiliki implementasi
+      - [ ] Map visualization - "Map visualization coming soon" di Seismic Survey, Well, Field, dan Facility
+      - [ ] Advanced analytics - "Advanced analytics coming soon" di semua domain
+      - [ ] Live data integration untuk overview statistics
+  - [x] **Permintaan Data (Consumer)**: Formulir bagi SKK Migas untuk membuat permintaan data dari KKKS.
+  - [x] Implementasi CRUD untuk Broker, Rute Data, Konfigurasi, dan Jaringan.
+  - [x] Placeholder informatif untuk "Manajemen Kontainer" dan "Sumber Data Eksternal".
 
 - [x] **Manajemen Data (100%)**
-  - [x] Buat halaman placeholder Manajemen Data.
-  - [x] Hubungkan ke koleksi Firestore (resources, contracts, routes, configs).
-  - [x] Implementasikan Tabel CRUD untuk setiap koleksi.
-  - [x] Buat formulir untuk menambah/mengedit data.
+  - [x] Halaman terpusat untuk CRUD.
+  - [x] **Sumber Daya**: Kelola metadata data eksplorasi & produksi (GeoJSON, Well Log, dll).
+  - [x] **Kontrak Penggunaan**: Tentukan kebijakan akses (misal: data Blok A hanya bisa diakses oleh SKK Migas selama 1 tahun).
 
-- [x] **Pengontrol Konektor (100%)**
-  - [x] Buat halaman Pengontrol Konektor.
-  - [x] Tampilkan status untuk 4 komponen (data dummy).
-  - [x] Hubungkan status ke koleksi "controllers" di Firestore.
+- [x] **Status Konektor (100%)**
+  - [x] **Pengontrol Konektor**: Monitor status komponen inti konektor (misal: Route Handler, Database Handler).
+  - [x] **Konektor Dataspace**: Tampilkan status modul IDS (Resource Handling, Usage Control, dll).
+  - [x] **Layanan Eksternal**: Monitor konektivitas ke layanan IDS lain (Broker, DAPS).
 
-- [x] **Konektor Dataspace (100%)**
-  - [x] Buat halaman Konektor Dataspace dengan daftar modul.
-  - [x] Tampilkan tabel dari koleksi yang sesuai untuk setiap modul (resources, policies, messages, users).
-  - [x] Hubungkan ke data Firestore langsung.
+- [x] **Sistem & Layanan (100%)**
+  - [x] **Routing & Services**: Kelola rute data (Camel routes) dan aplikasi layanan internal.
+  - [x] **Sistem Backend**: Lihat status API dan log pemrosesan dari sistem backend.
 
-- [x] **Routing & Services (100%)**
-  - [x] Buat halaman placeholder Routing & Services.
-  - [x] Implementasikan Tabel & Formulir CRUD untuk Rute Camel (koleksi "routes").
-  - [x] Implementasikan Tabel & Formulir CRUD untuk Aplikasi Layanan (koleksi "service-applications").
+---
 
-- [x] **Sistem Backend (100%)**
-  - [x] Buat halaman placeholder Sistem Backend.
-  - [x] Tampilkan kartu status API dari koleksi "apis".
-  - [x] Tampilkan tabel log pemrosesan dari koleksi "processing_logs".
+### Vocabulary Provider - Tugas yang Belum Selesai
 
-- [x] **Layanan IDS Eksternal (100%)**
-  - [x] Buat halaman placeholder Layanan Eksternal.
-  - [x] Implementasikan daftar tautan statis.
-  - [x] Hubungkan status layanan ke data Firestore.
+- [ ] **Dashboard Overview Integration (0%)**
+  - [ ] Integrasikan API statistics untuk menampilkan data real-time
+  - [ ] Update domain stats (total, active, inactive) dari database
+  - [ ] Implementasi useEffect untuk fetch data dari `/api/mdm/{domain}/stats`
+  - [ ] Real-time compliance status monitoring
+
+- [ ] **Import/Export Functionality (0%)**
+  - [ ] Implementasi Import Data untuk batch upload CSV/Excel
+  - [ ] Implementasi Export Report untuk generate laporan PDF/Excel
+  - [ ] File validation dan error handling
+  - [ ] Progress indicator untuk operasi import/export
+
+- [ ] **Settings & Configuration (0%)**
+  - [ ] Settings panel untuk konfigurasi MDM system
+  - [ ] User preferences dan default values
+  - [ ] System configuration options
+  - [ ] Backup & restore functionality
+
+- [ ] **Map Visualization (0%)**
+  - [ ] Integrasi dengan peta interaktif (Leaflet/MapBox)
+  - [ ] Tampilkan geometri Working Area, Wells, Fields, Facilities
+  - [ ] Layer management untuk berbagai domain data
+  - [ ] Spatial analysis tools
+
+- [ ] **Advanced Analytics (0%)**
+  - [ ] Chart dan graph untuk data analysis
+  - [ ] Trend analysis dan forecasting
+  - [ ] Performance metrics dashboard
+  - [ ] Export analytics ke format laporan
+
+- [ ] **Data Quality & Monitoring (30%)**
+  - [x] Basic validation rules implementation
+  - [ ] Advanced business rule validation
+  - [ ] Data quality scoring system
+  - [ ] Automated data quality reports
+  - [ ] Alert system untuk data quality issues
+
+---
+
+### Catatan Tambahan
+
+*   Fitur lain yang Anda sebutkan (seperti filter tabel, dark mode, dan pencarian lanjutan) adalah penyempurnaan yang sangat baik, tetapi memerlukan implementasi yang lebih kompleks.
+*   API endpoints untuk semua domain MDM sudah berfungsi dengan baik dan terintegrasi dengan database.
+*   Database schema MDM Hulu Migas sudah lengkap sesuai SKK Migas Data Specification v2.
+*   Perlu fokus pada integrasi frontend dengan backend untuk fitur-fitur advanced seperti statistics, map visualization, dan analytics.

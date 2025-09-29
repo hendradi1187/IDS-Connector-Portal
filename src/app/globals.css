@@ -8,70 +8,129 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 96.1%; /* #F5F5F5 */
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    /* Industrial Energy Color Scheme - Light Mode */
+    --background: 210 20% 96%; /* #ECEFF1 - Light Gray Background */
+    --foreground: 210 50% 15%; /* Dark Blue-Gray Text */
+    --card: 0 0% 100%; /* Pure White Cards */
+    --card-foreground: 210 50% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 262 52% 57%; /* #673AB7 */
+    --popover-foreground: 210 50% 15%;
+
+    /* Primary Colors - Industrial Blue */
+    --primary: 207 96% 30%; /* #005B96 - Industrial Blue */
     --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 231 48% 54%; /* #3F51B5 */
+    --primary-light: 207 68% 50%; /* #1976D2 - Light Industrial Blue */
+
+    /* Secondary Colors - Energy Green */
+    --secondary: 154 60% 33%; /* #2E7D32 - Energy Green */
+    --secondary-foreground: 0 0% 98%;
+    --energy-green: 174 100% 33%; /* #00A884 - Bright Energy Green */
+
+    /* Neutral Colors */
+    --muted: 210 20% 94%; /* #ECEFF1 - Light Gray */
+    --muted-foreground: 210 15% 60%; /* #90A4AE - Medium Gray */
+
+    /* Accent Colors - Migas Industry */
+    --accent: 36 100% 50%; /* #FF9800 - Orange Migas */
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
+    --warning: 36 100% 50%; /* #FF9800 - Orange Warning */
+    --warning-foreground: 0 0% 98%;
+
+    /* Safety & Error Colors */
+    --destructive: 4 90% 58%; /* #D32F2F - Red Safety */
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 262 52% 57%;
-    --radius: 0.5rem;
-    --chart-1: 262 52% 57%;
-    --chart-2: 231 48% 54%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --sidebar-background: 240 10% 3.9%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 262 52% 57%;
+    --error: 4 90% 58%; /* #D32F2F - Red Error */
+
+    /* Data Traffic Colors */
+    --data-request: 207 96% 30%; /* Blue for Requests */
+    --data-response: 154 60% 33%; /* Green for Responses */
+    --data-error: 4 90% 58%; /* Red for Errors */
+    --data-latency: 36 100% 50%; /* Orange for Performance */
+
+    /* Interface Elements */
+    --border: 210 15% 85%; /* Light Gray Border */
+    --input: 210 15% 90%; /* Input Background */
+    --ring: 207 96% 30%; /* Focus Ring - Industrial Blue */
+    --radius: 0.75rem; /* Slightly larger radius for industrial feel */
+
+    /* Chart Colors for Energy Industry */
+    --chart-1: 207 96% 30%; /* Industrial Blue */
+    --chart-2: 154 60% 33%; /* Energy Green */
+    --chart-3: 36 100% 50%; /* Orange Migas */
+    --chart-4: 4 90% 58%; /* Red Safety */
+    --chart-5: 174 100% 33%; /* Bright Green */
+
+    /* Sidebar - Professional Dark */
+    --sidebar-background: 210 50% 8%; /* Dark Blue-Gray */
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 207 96% 30%; /* Industrial Blue */
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 262 52% 57%;
+    --sidebar-accent: 210 30% 12%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 210 30% 15%;
+    --sidebar-ring: 207 96% 30%;
   }
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 262 52% 57%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 231 48% 54%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 262 52% 57%;
-    --chart-1: 262 52% 57%;
-    --chart-2: 231 48% 54%;
-    --sidebar-background: 240 10% 3.9%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 262 52% 57%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 262 52% 57%;
+    /* Industrial Energy Color Scheme - Dark Mode (Control Room) */
+    --background: 210 40% 4%; /* Very Dark Blue-Gray Background */
+    --foreground: 210 20% 90%; /* Light Gray Text */
+    --card: 210 35% 6%; /* Dark Card Background */
+    --card-foreground: 210 20% 90%;
+    --popover: 210 35% 6%;
+    --popover-foreground: 210 20% 90%;
+
+    /* Primary Colors - Brighter for Dark Mode */
+    --primary: 207 85% 45%; /* #1976D2 - Bright Industrial Blue */
+    --primary-foreground: 210 40% 4%;
+    --primary-light: 207 85% 55%; /* Lighter Blue for hover */
+
+    /* Secondary Colors - Bright Energy Green */
+    --secondary: 174 85% 40%; /* #00A884 - Bright Energy Green */
+    --secondary-foreground: 210 40% 4%;
+    --energy-green: 174 95% 45%; /* Brighter Energy Green */
+
+    /* Neutral Colors for Dark Mode */
+    --muted: 210 30% 8%; /* Dark Gray */
+    --muted-foreground: 210 15% 65%; /* Medium Light Gray */
+
+    /* Accent Colors - High Contrast for Visibility */
+    --accent: 36 100% 60%; /* #FF9800 - Bright Orange */
+    --accent-foreground: 210 40% 4%;
+    --warning: 36 100% 60%; /* Bright Orange Warning */
+    --warning-foreground: 210 40% 4%;
+
+    /* Safety & Error Colors - High Visibility */
+    --destructive: 4 85% 60%; /* Bright Red Safety */
+    --destructive-foreground: 210 40% 4%;
+    --error: 4 85% 60%; /* Bright Red Error */
+
+    /* Data Traffic Colors - High Contrast */
+    --data-request: 207 85% 45%; /* Bright Blue for Requests */
+    --data-response: 174 85% 40%; /* Bright Green for Responses */
+    --data-error: 4 85% 60%; /* Bright Red for Errors */
+    --data-latency: 36 100% 60%; /* Bright Orange for Performance */
+
+    /* Interface Elements */
+    --border: 210 25% 15%; /* Dark Border */
+    --input: 210 30% 10%; /* Dark Input Background */
+    --ring: 207 85% 45%; /* Focus Ring - Bright Blue */
+
+    /* Chart Colors for Dark Mode Energy Industry */
+    --chart-1: 207 85% 45%; /* Bright Industrial Blue */
+    --chart-2: 174 85% 40%; /* Bright Energy Green */
+    --chart-3: 36 100% 60%; /* Bright Orange */
+    --chart-4: 4 85% 60%; /* Bright Red */
+    --chart-5: 174 95% 45%; /* Extra Bright Green */
+
+    /* Sidebar - Control Room Style */
+    --sidebar-background: 210 45% 3%; /* Very Dark Blue */
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 207 85% 45%; /* Bright Industrial Blue */
+    --sidebar-primary-foreground: 210 40% 4%;
+    --sidebar-accent: 210 35% 8%;
+    --sidebar-accent-foreground: 210 20% 85%;
+    --sidebar-border: 210 30% 12%;
+    --sidebar-ring: 207 85% 45%;
   }
 }
 
@@ -81,5 +140,149 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Industrial Energy & Migas Utility Classes */
+@layer utilities {
+  /* Primary Industrial Colors */
+  .bg-industrial-blue {
+    background-color: hsl(var(--primary));
+  }
+  .text-industrial-blue {
+    color: hsl(var(--primary));
+  }
+  .border-industrial-blue {
+    border-color: hsl(var(--primary));
+  }
+
+  .bg-energy-green {
+    background-color: hsl(var(--secondary));
+  }
+  .text-energy-green {
+    color: hsl(var(--secondary));
+  }
+  .border-energy-green {
+    border-color: hsl(var(--secondary));
+  }
+
+  /* Migas Accent Colors */
+  .bg-migas-orange {
+    background-color: hsl(var(--accent));
+  }
+  .text-migas-orange {
+    color: hsl(var(--accent));
+  }
+  .border-migas-orange {
+    border-color: hsl(var(--accent));
+  }
+
+  .bg-safety-red {
+    background-color: hsl(var(--destructive));
+  }
+  .text-safety-red {
+    color: hsl(var(--destructive));
+  }
+  .border-safety-red {
+    border-color: hsl(var(--destructive));
+  }
+
+  /* Data Traffic Color Classes */
+  .bg-data-request {
+    background-color: hsl(var(--data-request));
+  }
+  .text-data-request {
+    color: hsl(var(--data-request));
+  }
+
+  .bg-data-response {
+    background-color: hsl(var(--data-response));
+  }
+  .text-data-response {
+    color: hsl(var(--data-response));
+  }
+
+  .bg-data-error {
+    background-color: hsl(var(--data-error));
+  }
+  .text-data-error {
+    color: hsl(var(--data-error));
+  }
+
+  .bg-data-latency {
+    background-color: hsl(var(--data-latency));
+  }
+  .text-data-latency {
+    color: hsl(var(--data-latency));
+  }
+
+  /* Industrial Status Indicators */
+  .status-online {
+    @apply bg-energy-green text-white;
+  }
+  .status-warning {
+    @apply bg-migas-orange text-white;
+  }
+  .status-error {
+    @apply bg-safety-red text-white;
+  }
+  .status-offline {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  /* Control Room Theme Classes */
+  .control-room-bg {
+    @apply bg-card border border-border;
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+  }
+
+  .monitoring-panel {
+    @apply control-room-bg p-6 rounded-lg shadow-lg;
+    border-left: 4px solid hsl(var(--primary));
+  }
+
+  .energy-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+  }
+
+  .migas-gradient {
+    background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--accent)) 100%);
+  }
+
+  /* Data Visualization Helpers */
+  .chart-industrial {
+    --color-1: hsl(var(--chart-1));
+    --color-2: hsl(var(--chart-2));
+    --color-3: hsl(var(--chart-3));
+    --color-4: hsl(var(--chart-4));
+    --color-5: hsl(var(--chart-5));
+  }
+
+  /* Professional Card Styles */
+  .professional-card {
+    @apply bg-card border border-border rounded-lg shadow-sm;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .professional-card:hover {
+    @apply shadow-md;
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  /* KPI Card Styles */
+  .kpi-card-requests {
+    @apply professional-card border-l-4 border-l-data-request;
+  }
+
+  .kpi-card-responses {
+    @apply professional-card border-l-4 border-l-data-response;
+  }
+
+  .kpi-card-errors {
+    @apply professional-card border-l-4 border-l-data-error;
+  }
+
+  .kpi-card-latency {
+    @apply professional-card border-l-4 border-l-data-latency;
   }
 }
