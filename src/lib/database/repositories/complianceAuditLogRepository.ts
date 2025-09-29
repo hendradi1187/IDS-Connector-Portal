@@ -316,6 +316,24 @@ export class ComplianceAuditLogRepository {
 
     const stats = await this.getComplianceStatistics(startDate, endDate);
 
+    const auditLogs = await Promise.all(logs.map(async (log) => ({
+      id: log.id,
+      timestamp: log.timestamp,
+      eventType: log.eventType,
+      action: log.action,
+      user: log.user ? {
+        id: log.user.id,
+        name: log.user.name,
+        role: log.user.role
+      } : null,
+      entityType: log.entityType,
+      entityId: log.entityId,
+      securityLevel: log.securityLevel,
+      dataClassification: log.dataClassification,
+      riskScore: log.riskScore,
+      integrityVerified: await this.verifyLogIntegrity(log.id)
+    })));
+
     return {
       reportMetadata: {
         generatedAt: new Date().toISOString(),
@@ -329,23 +347,7 @@ export class ComplianceAuditLogRepository {
           : 'PP No. 5/2021 tentang Pengelolaan Data Migas'
       },
       summary: stats,
-      auditLogs: logs.map(log => ({
-        id: log.id,
-        timestamp: log.timestamp,
-        eventType: log.eventType,
-        action: log.action,
-        user: log.user ? {
-          id: log.user.id,
-          name: log.user.name,
-          role: log.user.role
-        } : null,
-        entityType: log.entityType,
-        entityId: log.entityId,
-        securityLevel: log.securityLevel,
-        dataClassification: log.dataClassification,
-        riskScore: log.riskScore,
-        integrityVerified: await this.verifyLogIntegrity(log.id)
-      }))
+      auditLogs
     };
   }
 }

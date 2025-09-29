@@ -323,6 +323,21 @@ export class ResourceUploadAuditLogRepository {
       }
     });
 
+    const uploadsWithIntegrity = await Promise.all(uploads.map(async (upload) => ({
+      id: upload.id,
+      resourceId: upload.resourceId,
+      originalFileName: upload.originalFileName,
+      fileSize: upload.fileSize.toString(),
+      uploadStatus: upload.uploadStatus,
+      virusScanStatus: upload.virusScanStatus,
+      encryptionStatus: upload.encryptionStatus,
+      validationStatus: upload.validationStatus,
+      dataClassification: upload.dataClassification,
+      user: upload.user,
+      timestamp: upload.timestamp,
+      integrityVerified: await this.verifyUploadLogIntegrity(upload.id)
+    })));
+
     return {
       reportMetadata: {
         generatedAt: new Date().toISOString(),
@@ -335,20 +350,7 @@ export class ResourceUploadAuditLogRepository {
       },
       statistics,
       highRiskUploads: highRiskUploads.length,
-      uploads: uploads.map(upload => ({
-        id: upload.id,
-        resourceId: upload.resourceId,
-        originalFileName: upload.originalFileName,
-        fileSize: upload.fileSize.toString(),
-        uploadStatus: upload.uploadStatus,
-        virusScanStatus: upload.virusScanStatus,
-        encryptionStatus: upload.encryptionStatus,
-        validationStatus: upload.validationStatus,
-        dataClassification: upload.dataClassification,
-        user: upload.user,
-        timestamp: upload.timestamp,
-        integrityVerified: await this.verifyUploadLogIntegrity(upload.id)
-      }))
+      uploads: uploadsWithIntegrity
     };
   }
 

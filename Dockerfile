@@ -10,11 +10,11 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Copy skema Prisma terlebih dahulu
+COPY prisma ./prisma/
+
 # Copy sisa source code
 COPY . .
-
-# Copy skema Prisma
-COPY prisma ./prisma/
 
 # Generate Prisma Client
 RUN npx prisma generate

@@ -426,6 +426,21 @@ export class RequestActionAuditLogRepository {
       }
     });
 
+    const requestActions = await Promise.all(requestLogs.map(async (log) => ({
+      id: log.id,
+      requestId: log.requestId,
+      actionType: log.actionType,
+      actionStatus: log.actionStatus,
+      performedBy: log.performedBy,
+      authorizedBy: log.authorizedBy,
+      previousStatus: log.previousStatus,
+      newStatus: log.newStatus,
+      statusReason: log.statusReason,
+      securityClearance: log.securityClearance,
+      timestamp: log.timestamp,
+      integrityVerified: await this.verifyRequestLogIntegrity(log.id)
+    })));
+
     return {
       reportMetadata: {
         generatedAt: new Date().toISOString(),
@@ -437,20 +452,7 @@ export class RequestActionAuditLogRepository {
         compliance: ['ISO_27001', 'PP_NO_5_2021_MIGAS']
       },
       statistics,
-      requestActions: requestLogs.map(log => ({
-        id: log.id,
-        requestId: log.requestId,
-        actionType: log.actionType,
-        actionStatus: log.actionStatus,
-        performedBy: log.performedBy,
-        authorizedBy: log.authorizedBy,
-        previousStatus: log.previousStatus,
-        newStatus: log.newStatus,
-        statusReason: log.statusReason,
-        securityClearance: log.securityClearance,
-        timestamp: log.timestamp,
-        integrityVerified: await this.verifyRequestLogIntegrity(log.id)
-      }))
+      requestActions
     };
   }
 
