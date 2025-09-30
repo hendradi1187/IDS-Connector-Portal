@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Route, RouteStatus } from '@/generated/prisma';
+import { Route, RouteStatus } from '@prisma/client';
 
 export class RouteRepository {
   async findAll() {

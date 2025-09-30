@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ConnectorMetric, ConnectorMetricType } from '@/generated/prisma';
+import { ConnectorMetric, ConnectorMetricType } from '@prisma/client';
 
 export class ConnectorMetricRepository {
   async findAll() {

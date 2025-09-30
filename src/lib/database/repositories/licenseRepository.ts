@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { License, LicenseUsageLog, LicenseStatus, LicenseType, LicenseLevel, LicenseUsageType, UsageStatus } from '@/generated/prisma';
+import { License, LicenseUsageLog, LicenseStatus, LicenseType, LicenseLevel, LicenseUsageType, UsageStatus } from '@prisma/client';
 import { createHash, createHmac } from 'crypto';
 
 export class LicenseRepository {

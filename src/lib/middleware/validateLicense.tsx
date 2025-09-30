@@ -1,7 +1,7 @@
 import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { LicenseRepository } from '@/lib/database/repositories/licenseRepository';
-import { LicenseUsageType } from '@/generated/prisma';
+import { LicenseUsageType } from '@prisma/client';
 
 const licenseRepo = new LicenseRepository();
 

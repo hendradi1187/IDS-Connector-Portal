@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RoutingServiceRepository } from '@/lib/database/repositories';
-import { RoutingServiceStatus, RoutingType, LoadBalancingType } from '@/generated/prisma';
+import { RoutingServiceStatus, RoutingType, LoadBalancingType } from '@prisma/client';
 
 const routingServiceRepo = new RoutingServiceRepository();
 

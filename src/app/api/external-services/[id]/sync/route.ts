@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ExternalServiceRepository, AdaptorSyncLogRepository, AdaptorAuditLogRepository } from '@/lib/database/repositories';
-import { AdaptorSyncType } from '@/generated/prisma';
+import { AdaptorSyncType } from '@prisma/client';
 
 const externalServiceRepo = new ExternalServiceRepository();
 const syncLogRepo = new AdaptorSyncLogRepository();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServiceApplicationRepository } from '@/lib/database/repositories';
-import { ServiceApplicationStatus } from '@/generated/prisma';
+import { ServiceApplicationStatus } from '@prisma/client';
 
 const serviceAppRepo = new ServiceApplicationRepository();
 

@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { DataSource, Prisma } from '@/generated/prisma';
+import { DataSource, Prisma } from '@prisma/client';
 
 export class DataSourceRepository {
   async findAll() {

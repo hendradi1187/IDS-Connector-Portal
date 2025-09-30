@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BrokerRepository } from '@/lib/database/repositories';
-import { ValidationStatus } from '@/generated/prisma';
+import { ValidationStatus } from '@prisma/client';
 
 const brokerRepo = new BrokerRepository();
 

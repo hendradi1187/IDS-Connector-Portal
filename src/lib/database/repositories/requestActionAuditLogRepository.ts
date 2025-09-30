@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { RequestActionAuditLog, RequestActionType, RequestActionStatus, RequestStatus, SecurityLevel } from '@/generated/prisma';
+import { RequestActionAuditLog, RequestActionType, RequestActionStatus, RequestStatus, SecurityLevel } from '@prisma/client';
 import { createHash } from 'crypto';
 
 export class RequestActionAuditLogRepository {

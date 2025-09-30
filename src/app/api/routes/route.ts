@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RouteRepository } from '@/lib/database/repositories';
-import { RouteStatus } from '@/generated/prisma';
+import { RouteStatus } from '@prisma/client';
 
 const routeRepo = new RouteRepository();
 

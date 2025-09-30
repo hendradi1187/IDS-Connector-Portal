@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ProcessingLog, ProcessingStatus, Prisma } from '@/generated/prisma';
+import { ProcessingLog, ProcessingStatus, Prisma } from '@prisma/client';
 
 export class ProcessingLogRepository {
   async findAll() {

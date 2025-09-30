@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { SystemLog, LogLevel, Prisma } from '@/generated/prisma';
+import { SystemLog, LogLevel, Prisma } from '@prisma/client';
 
 export class SystemLogRepository {
   async findAll(limit: number = 100) {

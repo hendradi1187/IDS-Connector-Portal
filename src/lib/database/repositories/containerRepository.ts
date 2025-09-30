@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Container, ContainerStatus, Prisma } from '@/generated/prisma';
+import { Container, ContainerStatus, Prisma } from '@prisma/client';
 
 export class ContainerRepository {
   async findAll() {

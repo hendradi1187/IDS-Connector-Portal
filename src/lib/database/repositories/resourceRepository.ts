@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Resource, ResourceType, AccessPolicy, Prisma } from '@/generated/prisma';
+import { Resource, ResourceType, AccessPolicy, Prisma } from '@prisma/client';
 
 export class ResourceRepository {
   async findAll() {

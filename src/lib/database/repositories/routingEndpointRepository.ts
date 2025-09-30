@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { RoutingEndpoint, EndpointStatus } from '@/generated/prisma';
+import { RoutingEndpoint, EndpointStatus } from '@prisma/client';
 
 export class RoutingEndpointRepository {
   async findAll() {

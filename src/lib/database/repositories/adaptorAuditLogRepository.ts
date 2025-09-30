@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { AdaptorAuditLog } from '@/generated/prisma';
+import { AdaptorAuditLog } from '@prisma/client';
 
 export class AdaptorAuditLogRepository {
   async findAll(limit: number = 100) {

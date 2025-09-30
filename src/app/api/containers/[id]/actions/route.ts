@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ContainerRepository } from '@/lib/database/repositories/containerRepository';
-import { ContainerStatus } from '@/generated/prisma';
+import { ContainerStatus } from '@prisma/client';
 
 const containerRepo = new ContainerRepository();
 

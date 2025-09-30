@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ConnectorController, ConnectorControllerStatus, ConnectorControllerType, Prisma } from '@/generated/prisma';
+import { ConnectorController, ConnectorControllerStatus, ConnectorControllerType, Prisma } from '@prisma/client';
 
 export class ConnectorControllerRepository {
   async findAll() {

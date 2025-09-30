@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { NetworkSettingRepository } from '@/lib/database/repositories';
-import { NetworkProtocol, NetworkStatus } from '@/generated/prisma';
+import { NetworkProtocol, NetworkStatus } from '@prisma/client';
 
 const networkSettingRepo = new NetworkSettingRepository();
 

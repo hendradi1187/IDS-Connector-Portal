@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ComplianceAuditLog, AuditEventType, DataClassification, SecurityLevel } from '@/generated/prisma';
+import { ComplianceAuditLog, AuditEventType, DataClassification, SecurityLevel } from '@prisma/client';
 import { createHash } from 'crypto';
 
 export class ComplianceAuditLogRepository {

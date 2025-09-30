@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ResourceRepository } from '@/lib/database/repositories';
-import { ResourceType, AccessPolicy } from '@/generated/prisma';
+import { ResourceType, AccessPolicy } from '@prisma/client';
 
 const resourceRepo = new ResourceRepository();
 

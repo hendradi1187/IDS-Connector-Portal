@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RequestRepository } from '@/lib/database/repositories';
-import { RequestType, RequestStatus } from '@/generated/prisma';
+import { RequestType, RequestStatus } from '@prisma/client';
 
 const requestRepo = new RequestRepository();
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SystemLogRepository } from '@/lib/database/repositories';
-import { LogLevel } from '@/generated/prisma';
+import { LogLevel } from '@prisma/client';
 
 const systemLogRepo = new SystemLogRepository();
 

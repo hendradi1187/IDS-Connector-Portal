@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { NetworkSetting, NetworkProtocol, NetworkStatus } from '@/generated/prisma';
+import { NetworkSetting, NetworkProtocol, NetworkStatus } from '@prisma/client';
 
 export class NetworkSettingRepository {
   async findAll() {

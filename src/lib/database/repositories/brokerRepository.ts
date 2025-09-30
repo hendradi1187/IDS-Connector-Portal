@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Broker, ValidationStatus } from '@/generated/prisma';
+import { Broker, ValidationStatus } from '@prisma/client';
 
 export class BrokerRepository {
   async findAll() {

@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ResourceUploadAuditLog, UploadStatus, VirusScanStatus, EncryptionStatus, DataClassification, ValidationStatus } from '@/generated/prisma';
+import { ResourceUploadAuditLog, UploadStatus, VirusScanStatus, EncryptionStatus, DataClassification, ValidationStatus } from '@prisma/client';
 import { createHash } from 'crypto';
 
 export class ResourceUploadAuditLogRepository {

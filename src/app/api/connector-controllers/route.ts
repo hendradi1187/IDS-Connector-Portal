@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ConnectorControllerRepository } from '@/lib/database/repositories';
-import { ConnectorControllerStatus, ConnectorControllerType } from '@/generated/prisma';
+import { ConnectorControllerStatus, ConnectorControllerType } from '@prisma/client';
 
 const connectorControllerRepo = new ConnectorControllerRepository();
 

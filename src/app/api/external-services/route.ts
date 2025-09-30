@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ExternalServiceRepository } from '@/lib/database/repositories';
-import { ExternalServiceType, ExternalServiceStatus, AuthenticationType } from '@/generated/prisma';
+import { ExternalServiceType, ExternalServiceStatus, AuthenticationType } from '@prisma/client';
 import { validateQuery, validateBody, externalServiceQuerySchema, externalServiceCreateSchema, createErrorResponse, validatePagination } from '@/lib/validation';
 
 const externalServiceRepo = new ExternalServiceRepository();

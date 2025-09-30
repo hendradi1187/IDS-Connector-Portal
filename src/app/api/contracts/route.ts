@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ContractRepository } from '@/lib/database/repositories';
-import { ContractStatus, ContractType } from '@/generated/prisma';
+import { ContractStatus, ContractType } from '@prisma/client';
 
 const contractRepo = new ContractRepository();
 

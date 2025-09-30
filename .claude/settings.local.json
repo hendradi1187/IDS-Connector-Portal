@@ -20,7 +20,9 @@
       "Bash(npm run typecheck:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(xargs sed:*)",
+      "Bash(docker build:*)"
     ],
     "deny": [],
     "ask": []

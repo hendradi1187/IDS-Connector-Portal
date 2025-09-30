@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { DataspaceConnector, DataspaceConnectorStatus, Prisma } from '@/generated/prisma';
+import { DataspaceConnector, DataspaceConnectorStatus, Prisma } from '@prisma/client';
 
 export class DataspaceConnectorRepository {
   async findAll() {

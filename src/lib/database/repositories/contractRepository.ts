@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Contract, ContractStatus, ContractType, Prisma } from '@/generated/prisma';
+import { Contract, ContractStatus, ContractType, Prisma } from '@prisma/client';
 
 export class ContractRepository {
   async findAll() {

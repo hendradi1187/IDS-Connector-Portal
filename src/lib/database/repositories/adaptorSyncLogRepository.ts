@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { AdaptorSyncLog, AdaptorSyncType, SyncStatus } from '@/generated/prisma';
+import { AdaptorSyncLog, AdaptorSyncType, SyncStatus } from '@prisma/client';
 
 export class AdaptorSyncLogRepository {
   async findAll() {

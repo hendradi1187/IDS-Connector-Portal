@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ServiceApplication, ServiceApplicationStatus, Prisma } from '@/generated/prisma';
+import { ServiceApplication, ServiceApplicationStatus, Prisma } from '@prisma/client';
 
 export class ServiceApplicationRepository {
   async findAll() {

@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ExternalService, ExternalServiceType, ExternalServiceStatus, AuthenticationType, Prisma } from '@/generated/prisma';
+import { ExternalService, ExternalServiceType, ExternalServiceStatus, AuthenticationType, Prisma } from '@prisma/client';
 
 export class ExternalServiceRepository {
   async findAll() {

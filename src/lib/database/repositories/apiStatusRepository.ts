@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { ApiStatus, ApiStatusType } from '@/generated/prisma';
+import { ApiStatus, ApiStatusType } from '@prisma/client';
 
 export class ApiStatusRepository {
   async findAll() {

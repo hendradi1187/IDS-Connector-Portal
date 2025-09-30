@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Request, RequestType, RequestStatus, Prisma } from '@/generated/prisma';
+import { Request, RequestType, RequestStatus, Prisma } from '@prisma/client';
 
 export class RequestRepository {
   async findAll() {

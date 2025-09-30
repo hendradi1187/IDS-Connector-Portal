@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Config } from '@/generated/prisma';
+import { Config } from '@prisma/client';
 
 export class ConfigRepository {
   async findAll() {

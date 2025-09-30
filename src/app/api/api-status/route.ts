@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiStatusRepository } from '@/lib/database/repositories';
-import { ApiStatusType } from '@/generated/prisma';
+import { ApiStatusType } from '@prisma/client';
 
 const apiStatusRepo = new ApiStatusRepository();
 

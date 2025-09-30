@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DataspaceConnectorRepository } from '@/lib/database/repositories/dataspaceConnectorRepository';
-import { DataspaceConnectorStatus } from '@/generated/prisma';
+import { DataspaceConnectorStatus } from '@prisma/client';
 
 const dataspaceConnectorRepo = new DataspaceConnectorRepository();
 
