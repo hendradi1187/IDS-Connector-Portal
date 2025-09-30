@@ -1,4 +1,5 @@
-# docker-compose.yml
+# docker-compose.no-nginx.yml
+# Configuration without nginx proxy - use existing web server
 
 version: '3.8'
 
@@ -8,6 +9,8 @@ services:
     build: . # Membangun image dari Dockerfile di direktori saat ini
     container_name: ids_portal_app
     restart: unless-stopped
+    ports:
+      - "3000:3000" # Direct access to Next.js app
     env_file:
       - .env.production # Memuat variabel dari file .env.production
     depends_on:
@@ -28,27 +31,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data # Menyimpan data database secara persisten
+    ports:
+      - "5432:5432" # Expose PostgreSQL port for external access
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - app-network
-
-  # 3. Layanan Reverse Proxy (Nginx)
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: ids_portal_proxy
-    restart: unless-stopped
-    ports:
-      - "8080:80" # Port HTTP (changed to 8080 to avoid conflict)
-      - "8443:443" # Port HTTPS (changed to 8443 to avoid conflict)
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Mount file konfigurasi Nginx
-      # - /path/to/your/certs:/etc/nginx/certs:ro # Uncomment jika Anda punya sertifikat SSL
-    depends_on:
-      - app
     networks:
       - app-network
 
