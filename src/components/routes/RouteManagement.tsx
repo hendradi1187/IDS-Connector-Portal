@@ -46,6 +46,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { deleteRoute } from '@/app/routes/actions';
 import EditRouteDialog from './EditRouteDialog';
+import { useAuth } from '@/context/AuthContext';
 
 const statusVariants: { [key in Route['status']]: 'default' | 'outline' } = {
   Active: 'default',
@@ -56,6 +57,13 @@ export default function RouteManagement() {
   const [routes, setRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // RBAC: Admin only access
+  const canCreate = user?.role === 'Admin';
+  const canEdit = user?.role === 'Admin';
+  const canDelete = user?.role === 'Admin';
+  const canView = true; // All roles can view
 
   useEffect(() => {
     const q = query(collection(db, 'routes'), orderBy('created', 'desc'));
@@ -103,8 +111,13 @@ export default function RouteManagement() {
             <CardDescription>
               Manage data routes and endpoints for the connector.
             </CardDescription>
+            {!canCreate && (
+              <Badge variant="outline" className="mt-2">
+                Admin Only - View Access
+              </Badge>
+            )}
           </div>
-          <AddRouteDialog />
+          {canCreate && <AddRouteDialog />}
         </div>
       </CardHeader>
       <CardContent>
@@ -154,47 +167,58 @@ export default function RouteManagement() {
                   <TableCell>{new Date(route.created).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <EditRouteDialog route={route}>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                              Edit
-                            </DropdownMenuItem>
-                          </EditRouteDialog>
-                          <DropdownMenuSeparator />
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onSelect={(e) => e.preventDefault()}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the route "{route.name}".
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(route)}>
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {(canEdit || canDelete) ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            {canEdit && (
+                              <EditRouteDialog route={route}>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  Edit
+                                </DropdownMenuItem>
+                              </EditRouteDialog>
+                            )}
+                            {canEdit && canDelete && <DropdownMenuSeparator />}
+                            {canDelete && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem
+                                    className="text-destructive"
+                                    onSelect={(e) => e.preventDefault()}
+                                  >
+                                    Delete
+                                  </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently delete the route "{route.name}".
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(route)}>
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <Button aria-haspopup="true" size="icon" variant="ghost" disabled>
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">No actions available</span>
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

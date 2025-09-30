@@ -45,11 +45,20 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { deleteConfig } from '@/app/configs/actions';
 import EditConfigDialog from './EditConfigDialog';
+import { Badge } from '../ui/badge';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ConfigManagement() {
   const [configs, setConfigs] = useState<Config[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // RBAC: Admin only access
+  const canCreate = user?.role === 'Admin';
+  const canEdit = user?.role === 'Admin';
+  const canDelete = user?.role === 'Admin';
+  const canView = true; // All roles can view
 
   useEffect(() => {
     const q = query(collection(db, 'configs'), orderBy('created', 'desc'));
@@ -97,8 +106,13 @@ export default function ConfigManagement() {
             <CardDescription>
               Manage connector configurations and settings.
             </CardDescription>
+            {!canCreate && (
+              <Badge variant="outline" className="mt-2">
+                Admin Only - View Access
+              </Badge>
+            )}
           </div>
-          <AddConfigDialog />
+          {canCreate && <AddConfigDialog />}
         </div>
       </CardHeader>
       <CardContent>
@@ -144,47 +158,58 @@ export default function ConfigManagement() {
                   <TableCell>{new Date(config.created).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <EditConfigDialog config={config}>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                              Edit
-                            </DropdownMenuItem>
-                          </EditConfigDialog>
-                          <DropdownMenuSeparator />
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onSelect={(e) => e.preventDefault()}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the config "{config.key}".
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(config)}>
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {(canEdit || canDelete) ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            {canEdit && (
+                              <EditConfigDialog config={config}>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  Edit
+                                </DropdownMenuItem>
+                              </EditConfigDialog>
+                            )}
+                            {canEdit && canDelete && <DropdownMenuSeparator />}
+                            {canDelete && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem
+                                    className="text-destructive"
+                                    onSelect={(e) => e.preventDefault()}
+                                  >
+                                    Delete
+                                  </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently delete the config "{config.key}".
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(config)}>
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <Button aria-haspopup="true" size="icon" variant="ghost" disabled>
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">No actions available</span>
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
