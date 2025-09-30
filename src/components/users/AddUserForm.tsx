@@ -56,17 +56,26 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
+      console.log('📝 Submitting user form with values:', { ...values, email: values.email.substring(0, 3) + '***' });
+
       await addUser(values as Omit<User, 'id' | 'avatar' | 'createdAt'>);
+
       toast({
-        title: 'User Added',
-        description: `User ${values.name} has been successfully added.`,
+        title: 'User Added Successfully! ✅',
+        description: `User ${values.name} has been successfully added to the system.`,
       });
+
+      form.reset(); // Reset form after successful submission
       setOpen(false);
     } catch (error) {
+      console.error('❌ Form submission error:', error);
+
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add user. Please try again.';
+
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to add user. Please try again.',
+        title: 'Registration Failed ❌',
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
