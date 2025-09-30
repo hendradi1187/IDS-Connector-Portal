@@ -2,7 +2,7 @@
 
 import { db, auth } from '@/lib/firebase';
 import { User } from '@/lib/types';
-import { collection, addDoc, doc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 export async function addUser(userData: any) {
@@ -87,23 +87,92 @@ export async function addUser(userData: any) {
   }
 }
 
-export async function updateUser(id: string, user: Partial<Omit<User, 'id' | 'avatar' | 'createdAt'>>) {
+export async function updateUser(id: string, userData: Partial<Omit<User, 'id' | 'avatar' | 'createdAt'>>) {
   try {
+    console.log('🔍 Attempting to update user:', { id, ...userData, email: userData.email?.substring(0, 3) + '***' });
+
+    // Validate input data
+    if (!id) {
+      throw new Error('User ID is required');
+    }
+
+    if (userData.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userData.email)) {
+        throw new Error('Invalid email format');
+      }
+    }
+
     const userRef = doc(db, 'users', id);
-    const updateData = { ...user };
+    const updateData = {
+      ...userData,
+      updatedAt: new Date().toISOString(),
+    };
+
     await updateDoc(userRef, updateData);
+
+    console.log('✅ User successfully updated with ID:', id);
+    return { success: true, id, ...updateData };
+
   } catch (e) {
-    console.error('Error updating document: ', e);
+    console.error('❌ Error updating user:', e);
+
+    if (e instanceof Error) {
+      if (e.message.includes('permission-denied')) {
+        throw new Error('Permission denied. Please check Firebase security rules.');
+      } else if (e.message.includes('not-found')) {
+        throw new Error('User not found. The user may have been deleted.');
+      } else if (e.message.includes('Invalid email')) {
+        throw new Error(e.message);
+      } else if (e.message.includes('User ID is required')) {
+        throw new Error(e.message);
+      } else {
+        throw new Error(`Update error: ${e.message}`);
+      }
+    }
+
     throw new Error('Failed to update user in database.');
   }
 }
 
 export async function deleteUser(id: string) {
-    try {
-        const userRef = doc(db, 'users', id);
-        await deleteDoc(userRef);
-    } catch (e) {
-        console.error('Error deleting document: ', e);
-        throw new Error('Failed to delete user from database.');
+  try {
+    console.log('🔍 Attempting to delete user with ID:', id);
+
+    // Validate input
+    if (!id) {
+      throw new Error('User ID is required');
     }
+
+    const userRef = doc(db, 'users', id);
+
+    // Check if user exists before deletion
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      throw new Error('User not found. The user may have already been deleted.');
+    }
+
+    // Delete user profile from Firestore
+    await deleteDoc(userRef);
+
+    console.log('✅ User successfully deleted with ID:', id);
+    return { success: true, id, message: 'User deleted successfully' };
+
+  } catch (e) {
+    console.error('❌ Error deleting user:', e);
+
+    if (e instanceof Error) {
+      if (e.message.includes('permission-denied')) {
+        throw new Error('Permission denied. You do not have permission to delete users.');
+      } else if (e.message.includes('not-found') || e.message.includes('User not found')) {
+        throw new Error('User not found. The user may have already been deleted.');
+      } else if (e.message.includes('User ID is required')) {
+        throw new Error(e.message);
+      } else {
+        throw new Error(`Delete error: ${e.message}`);
+      }
+    }
+
+    throw new Error('Failed to delete user from database.');
+  }
 }

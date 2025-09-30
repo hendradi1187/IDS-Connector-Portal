@@ -24,6 +24,7 @@ import { updateUser } from '@/app/users/actions';
 import { useToast } from '@/hooks/use-toast';
 import { User } from '@/lib/types';
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -44,30 +45,53 @@ type EditUserFormProps = {
 export function EditUserForm({ user, setOpen }: EditUserFormProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
+
+  // RBAC check
+  const canEditUser = currentUser?.role === 'Admin';
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      organization: user.organization,
+      name: user.name || '',
+      email: user.email || '',
+      role: user.role || 'SKK-Consumer',
+      organization: user.organization || '',
     },
+    mode: 'onChange',
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    try {
-      await updateUser(user.id, values);
-      toast({
-        title: 'User Updated',
-        description: `User ${values.name} has been successfully updated.`,
-      });
-      setOpen(false);
-    } catch (error) {
+    if (!canEditUser) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to update user. Please try again.',
+        title: 'Permission Denied',
+        description: 'You do not have permission to edit users.',
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      console.log('🔍 Updating user:', { id: user.id, ...values, email: values.email.substring(0, 3) + '***' });
+
+      await updateUser(user.id, values);
+
+      toast({
+        title: 'User Updated Successfully! ✅',
+        description: `User ${values.name} has been successfully updated.`,
+      });
+
+      setOpen(false);
+    } catch (error) {
+      console.error('❌ Update user error:', error);
+
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update user. Please try again.';
+
+      toast({
+        variant: 'destructive',
+        title: 'Update Failed ❌',
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
