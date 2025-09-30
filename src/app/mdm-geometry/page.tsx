@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import GeometryManager from '@/components/mdm/geometry/GeometryManager';
 import GeometryInput from '@/components/ui/geometry-input';
 import CoordinatePicker from '@/components/ui/coordinate-picker';
+import MetadataManagement from '@/components/metadata/MetadataManagement';
 import {
   Globe,
   MapPin,
@@ -20,7 +21,8 @@ import {
   Info,
   Compass,
   Ruler,
-  Settings
+  Settings,
+  Database
 } from 'lucide-react';
 
 export default function MDMGeometryPage() {
@@ -131,10 +133,11 @@ export default function MDMGeometryPage() {
 
       {/* Main Interface */}
       <Tabs value={activeDemo} onValueChange={setActiveDemo} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="manager">Geometry Manager</TabsTrigger>
           <TabsTrigger value="input">Geometry Input</TabsTrigger>
           <TabsTrigger value="coordinates">Coordinate Picker</TabsTrigger>
+          <TabsTrigger value="metadata">Metadata Management</TabsTrigger>
           <TabsTrigger value="documentation">Documentation</TabsTrigger>
         </TabsList>
 
@@ -199,6 +202,11 @@ export default function MDMGeometryPage() {
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Metadata Management */}
+        <TabsContent value="metadata">
+          <MetadataManagement />
         </TabsContent>
 
         {/* Documentation */}
