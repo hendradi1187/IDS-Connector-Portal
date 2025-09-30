@@ -255,3 +255,89 @@ export type DataspaceConnector = {
   lastHealthCheck?: string;
   metadata: Record<string, any>;
 };
+
+// Vocabulary and Ontology Types
+export type Vocabulary = {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  status: 'Active' | 'Draft' | 'Deprecated';
+  namespace: string; // URI namespace for concepts
+  concepts: number; // Count of concepts
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Concept = {
+  id: string;
+  vocabularyId: string;
+  code: string; // Unique identifier within vocabulary
+  label: string;
+  definition: string;
+  notation?: string; // Optional short notation/abbreviation
+  broader?: string[]; // Parent concept IDs
+  narrower?: string[]; // Child concept IDs
+  related?: string[]; // Related concept IDs
+  status: 'Active' | 'Draft' | 'Deprecated';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OntologyRelationType =
+  | 'broader' // Hierarchical - parent concept
+  | 'narrower' // Hierarchical - child concept
+  | 'related' // Semantic - related concept
+  | 'exactMatch' // Semantic - exact same meaning
+  | 'closeMatch' // Semantic - similar meaning
+  | 'mappedTo' // Mapping - vocabulary to MDM field
+  | 'references' // Foreign key - data relationship
+  | 'partOf'; // Composition - part-whole relationship
+
+export type OntologyRelation = {
+  id: string;
+  sourceType: 'concept' | 'mdm' | 'resource' | 'field';
+  sourceId: string;
+  sourceName: string;
+  targetType: 'concept' | 'mdm' | 'resource' | 'field';
+  targetId: string;
+  targetName: string;
+  relationType: OntologyRelationType;
+  description?: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  createdBy: string;
+};
+
+export type ConceptMapping = {
+  id: string;
+  conceptId: string;
+  conceptLabel: string;
+  vocabularyId: string;
+  vocabularyName: string;
+  // MDM mapping
+  mdmDomain?: 'working-area' | 'seismic' | 'well' | 'field' | 'facility';
+  mdmField?: string; // e.g., 'statusWk', 'jenisKontrak'
+  mdmValue?: string; // The actual value in MDM
+  // Resource mapping
+  resourceType?: string;
+  resourceField?: string;
+  // Mapping metadata
+  mappingType: 'exact' | 'close' | 'broad' | 'narrow';
+  status: 'Active' | 'Draft' | 'Deprecated';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OntologyStats = {
+  totalVocabularies: number;
+  totalConcepts: number;
+  totalRelations: number;
+  totalMappings: number;
+  recentlyUpdated: number;
+  integrationCoverage: {
+    mdm: number; // Percentage of MDM fields mapped
+    resources: number; // Percentage of resource types mapped
+    vocabulary: number; // Percentage of concepts with mappings
+  };
+};
