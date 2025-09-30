@@ -16,7 +16,8 @@
       "Bash(docker buildx:*)",
       "Bash(timeout 300 docker compose up -d --build)",
       "Bash(npm run build:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": [],
     "ask": []
