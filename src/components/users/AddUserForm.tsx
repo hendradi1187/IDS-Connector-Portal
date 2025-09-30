@@ -32,8 +32,17 @@ const formSchema = z.object({
   email: z.string().email({
     message: 'Please enter a valid email address.',
   }),
+  password: z.string().min(6, {
+    message: 'Password must be at least 6 characters.',
+  }),
+  confirmPassword: z.string().min(6, {
+    message: 'Please confirm your password.',
+  }),
   role: z.enum(['Admin', 'KKKS-Provider', 'SKK-Consumer']),
   organization: z.string().min(2, { message: 'Organization is required.'}),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type AddUserFormProps = {
@@ -48,6 +57,8 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
     defaultValues: {
       name: '',
       email: '',
+      password: '',
+      confirmPassword: '',
       role: 'SKK-Consumer',
       organization: '',
     },
@@ -58,7 +69,13 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
     try {
       console.log('📝 Submitting user form with values:', { ...values, email: values.email.substring(0, 3) + '***' });
 
-      await addUser(values as Omit<User, 'id' | 'avatar' | 'createdAt'>);
+      // Extract password from values for Firebase Auth registration
+      const { password, confirmPassword, ...userDataForFirestore } = values;
+
+      await addUser({
+        ...userDataForFirestore,
+        password // Pass password for Firebase Auth registration
+      } as any);
 
       toast({
         title: 'User Added Successfully! ✅',
@@ -119,6 +136,32 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
               <FormLabel>Organization</FormLabel>
               <FormControl>
                 <Input placeholder="e.g., SKK Migas or Pertamina" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="Enter password (min. 6 characters)" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="Confirm password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
