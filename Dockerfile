@@ -29,6 +29,9 @@ RUN npm prune --production
 FROM node:18-alpine AS runner
 WORKDIR /app
 
+# Buat direktori public terlebih dahulu
+RUN mkdir -p ./public && chown node:node ./public
+
 # Set user non-root untuk keamanan
 USER node
 
@@ -36,8 +39,8 @@ USER node
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 # Copy hasil build Next.js
 COPY --from=builder --chown=node:node /app/.next ./.next
-# Copy file public
-COPY --from=builder --chown=node:node /app/public ./public
+# Copy file public jika ada
+COPY --from=builder --chown=node:node /app/public/ ./public/
 # Copy package.json
 COPY --from=builder --chown=node:node /app/package.json ./package.json
 
