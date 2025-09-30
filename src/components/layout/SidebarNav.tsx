@@ -10,6 +10,9 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -31,10 +34,13 @@ import {
   Building,
   History,
   Banknote,
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useState } from 'react';
 
 interface MenuItem {
   href: string;
@@ -45,24 +51,45 @@ interface MenuItem {
 
 interface MenuGroup {
   label: string;
+  icon: React.ComponentType<{ className?: string }>;
   items: MenuItem[];
+  collapsible?: boolean;
+  roles?: ('Admin' | 'KKKS-Provider' | 'SKK-Consumer')[];
 }
 
 const menuGroups: MenuGroup[] = [
   {
-    label: 'Main',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    collapsible: false,
     items: [
       { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    ]
+  },
+  {
+    label: 'Data Management',
+    icon: Database,
+    collapsible: true,
+    items: [
       { href: '/data-management', icon: Database, label: 'Metadata' },
       { href: '/mdm-geometry', icon: BookOpen, label: 'Catalog' },
       { href: '/vocabularies', icon: BookOpen, label: 'Vocabularies' },
     ]
   },
   {
-    label: 'Operations',
+    label: 'Governance',
+    icon: Shield,
+    collapsible: true,
     items: [
-      { href: '/policies', icon: Shield, label: 'Policy', roles: ['Admin'] },
+      { href: '/policies', icon: Shield, label: 'Policy' },
       { href: '/contracts', icon: FileText, label: 'Contract' },
+    ]
+  },
+  {
+    label: 'Operations',
+    icon: Activity,
+    collapsible: true,
+    items: [
       { href: '/routing-services', icon: Waypoints, label: 'Transfer' },
       { href: '/activity-history', icon: History, label: 'History' },
       { href: '/clearing-house', icon: Banknote, label: 'Clearing House' },
@@ -70,6 +97,9 @@ const menuGroups: MenuGroup[] = [
   },
   {
     label: 'Administration',
+    icon: Settings,
+    collapsible: true,
+    roles: ['Admin'],
     items: [
       { href: '/users', icon: Users, label: 'User Management', roles: ['Admin'] },
       { href: '/participants', icon: Building, label: 'Participants', roles: ['Admin'] },
@@ -77,7 +107,7 @@ const menuGroups: MenuGroup[] = [
       { href: '/connector-controller', icon: Plug, label: 'Connector Controller', roles: ['Admin'] },
       { href: '/dataspace-connector', icon: Boxes, label: 'Dataspace Connector', roles: ['Admin'] },
       { href: '/backend-system', icon: Server, label: 'Backend System', roles: ['Admin'] },
-      { href: '/external-services', icon: Network, label: 'External IDS Services', roles: ['Admin'] },
+      { href: '/external-services', icon: Network, label: 'External Services', roles: ['Admin'] },
       { href: '/gui', icon: Settings, label: 'GUI Settings', roles: ['Admin'] },
     ]
   },
@@ -86,14 +116,37 @@ const menuGroups: MenuGroup[] = [
 export default function SidebarNav() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    'Data Management': false,
+    'Governance': false,
+    'Operations': false,
+    'Administration': false,
+  });
 
   const hasAccess = (item: MenuItem): boolean => {
     if (!item.roles || item.roles.length === 0) return true;
     return user ? item.roles.includes(user.role) : false;
   };
 
+  const hasGroupAccess = (group: MenuGroup): boolean => {
+    if (!group.roles || group.roles.length === 0) return true;
+    return user ? group.roles.includes(user.role) : false;
+  };
+
   const getVisibleItems = (items: MenuItem[]): MenuItem[] => {
     return items.filter(hasAccess);
+  };
+
+  const toggleGroup = (groupLabel: string) => {
+    setOpenGroups(prev => ({ ...prev, [groupLabel]: !prev[groupLabel] }));
+  };
+
+  const isAnyChildActive = (items: MenuItem[]): boolean => {
+    return items.some(item =>
+      item.href === '/'
+        ? pathname === item.href
+        : pathname.startsWith(item.href)
+    );
   };
 
   return (
@@ -114,19 +167,18 @@ export default function SidebarNav() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        {menuGroups.map((group) => {
-          const visibleItems = getVisibleItems(group.items);
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuGroups.map((group) => {
+                if (!hasGroupAccess(group)) return null;
 
-          if (visibleItems.length === 0) return null;
+                const visibleItems = getVisibleItems(group.items);
+                if (visibleItems.length === 0) return null;
 
-          return (
-            <SidebarGroup key={group.label}>
-              <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 py-1.5">
-                {group.label}
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {visibleItems.map((item) => (
+                // Non-collapsible groups (like Main/Dashboard)
+                if (!group.collapsible) {
+                  return visibleItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <SidebarMenuButton
                         as={Link}
@@ -142,12 +194,62 @@ export default function SidebarNav() {
                         <span>{item.label}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          );
-        })}
+                  ));
+                }
+
+                // Collapsible groups
+                const isOpen = openGroups[group.label];
+                const hasActiveChild = isAnyChildActive(visibleItems);
+
+                return (
+                  <Collapsible
+                    key={group.label}
+                    open={isOpen}
+                    onOpenChange={() => toggleGroup(group.label)}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                          tooltip={group.label}
+                          isActive={hasActiveChild}
+                        >
+                          <group.icon className="h-4 w-4" />
+                          <span>{group.label}</span>
+                          <ChevronRight
+                            className={`ml-auto h-4 w-4 transition-transform ${
+                              isOpen ? 'rotate-90' : ''
+                            }`}
+                          />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {visibleItems.map((item) => (
+                            <SidebarMenuSubItem key={item.href}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={
+                                  item.href === '/'
+                                    ? pathname === item.href
+                                    : pathname.startsWith(item.href)
+                                }
+                              >
+                                <Link href={item.href}>
+                                  <item.icon className="h-4 w-4" />
+                                  <span>{item.label}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="mt-auto border-t border-sidebar-border">
         <SidebarMenu>

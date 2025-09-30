@@ -30,6 +30,7 @@ import WellManagement from '@/components/mdm/well/WellManagement';
 import FieldManagement from '@/components/mdm/field/FieldManagement';
 import FacilityManagement from '@/components/mdm/facility/FacilityManagement';
 import ValidationDashboard from '@/components/mdm/validation/ValidationDashboard';
+import { useAuth } from '@/context/AuthContext';
 const mdmDomains = [
   {
     id: 'working-area',
@@ -91,6 +92,14 @@ const mdmDomains = [
 
 export default function MdmResourceManagement() {
   const [activeTab, setActiveTab] = useState('overview');
+  const { user } = useAuth();
+
+  // RBAC: Define permissions
+  const canImportData = user?.role === 'Admin' || user?.role === 'KKKS-Provider';
+  const canExportReport = true; // All roles can export
+  const canAccessSettings = user?.role === 'Admin';
+  const canManageData = user?.role === 'Admin' || user?.role === 'KKKS-Provider';
+  const isReadOnly = user?.role === 'SKK-Consumer';
 
   return (
     <div className="space-y-6">
@@ -106,20 +115,31 @@ export default function MdmResourceManagement() {
               <CardDescription>
                 Fungsi ini digunakan oleh KKKS untuk mendaftarkan dan mengelola metadata sumber daya data yang akan dibagikan sesuai SKK Migas Data Specification v2.
               </CardDescription>
+              {isReadOnly && (
+                <Badge variant="outline" className="mt-2">
+                  Read-only Access
+                </Badge>
+              )}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <FileText className="h-4 w-4 mr-2" />
-                Import Data
-              </Button>
-              <Button variant="outline" size="sm">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Export Report
-              </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
+              {canImportData && (
+                <Button variant="outline" size="sm">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Import Data
+                </Button>
+              )}
+              {canExportReport && (
+                <Button variant="outline" size="sm">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Export Report
+                </Button>
+              )}
+              {canAccessSettings && (
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -224,27 +244,27 @@ export default function MdmResourceManagement() {
 
         {/* Domain-specific Tabs */}
         <TabsContent value="working-area">
-          <WorkingAreaManagement />
+          <WorkingAreaManagement canManage={canManageData} isReadOnly={isReadOnly} />
         </TabsContent>
 
         <TabsContent value="seismic">
-          <SeismicSurveyManagement />
+          <SeismicSurveyManagement canManage={canManageData} isReadOnly={isReadOnly} />
         </TabsContent>
 
         <TabsContent value="well">
-          <WellManagement />
+          <WellManagement canManage={canManageData} isReadOnly={isReadOnly} />
         </TabsContent>
 
         <TabsContent value="field">
-          <FieldManagement />
+          <FieldManagement canManage={canManageData} isReadOnly={isReadOnly} />
         </TabsContent>
 
         <TabsContent value="facility">
-          <FacilityManagement />
+          <FacilityManagement canManage={canManageData} isReadOnly={isReadOnly} />
         </TabsContent>
 
         <TabsContent value="validation">
-          <ValidationDashboard />
+          <ValidationDashboard canManage={canManageData} isReadOnly={isReadOnly} />
         </TabsContent>
       </Tabs>
     </div>

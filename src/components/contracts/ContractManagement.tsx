@@ -46,6 +46,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { deleteContract } from '@/app/contracts/actions';
 import EditContractDialog from './EditContractDialog';
+import { useAuth } from '@/context/AuthContext';
 
 const statusVariants: { [key in Contract['status']]: 'default' | 'destructive' } = {
   Aktif: 'default',
@@ -56,6 +57,13 @@ export default function ContractManagement() {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // RBAC: Define permissions
+  const canCreate = user?.role === 'Admin';
+  const canEdit = user?.role === 'Admin';
+  const canDelete = user?.role === 'Admin';
+  const canView = true; // All roles can view contracts
 
   useEffect(() => {
     const q = query(collection(db, 'contracts'), orderBy('created', 'desc'));
@@ -103,8 +111,13 @@ export default function ContractManagement() {
             <CardDescription>
               Kelola kontrak penggunaan data yang mengatur siapa dapat mengakses apa.
             </CardDescription>
+            {!canCreate && (
+              <Badge variant="outline" className="mt-2">
+                View-only Access
+              </Badge>
+            )}
           </div>
-          <AddContractDialog />
+          {canCreate && <AddContractDialog />}
         </div>
       </CardHeader>
       <CardContent>
