@@ -4,6 +4,7 @@ import { db, auth } from '@/lib/firebase';
 import { User } from '@/lib/types';
 import { collection, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { revalidatePath } from 'next/cache';
 
 export async function addUser(userData: any) {
   try {
@@ -156,6 +157,10 @@ export async function deleteUser(id: string) {
     await deleteDoc(userRef);
 
     console.log('✅ User successfully deleted with ID:', id);
+
+    // Revalidate the users page to refresh the data
+    revalidatePath('/users');
+
     return { success: true, id, message: 'User deleted successfully' };
 
   } catch (e) {

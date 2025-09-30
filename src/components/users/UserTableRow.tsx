@@ -67,6 +67,8 @@ export default function UserTableRow({ user }: UserTableRowProps) {
         title: 'User Deleted',
         description: `User ${user.name} has been successfully deleted.`,
       });
+      // Force page reload to refresh user list
+      window.location.reload();
     } catch (error) {
       console.error('Delete user error:', error);
       toast({
