@@ -559,3 +559,73 @@ export type SatuDataMetadata = {
   urlAkses: string;
   statusData: 'Aktif' | 'Tidak Aktif';
 };
+
+// GUI Settings Types
+export type UserPreferences = {
+  userId: string;
+  theme: ThemeSettings;
+  display: DisplaySettings;
+  notifications: NotificationSettings;
+  dashboard: DashboardSettings;
+  accessibility: AccessibilitySettings;
+  updatedAt: string;
+};
+
+export type ThemeSettings = {
+  mode: 'light' | 'dark' | 'system';
+  primaryColor: string;
+  accentColor: string;
+  fontSize: 'small' | 'medium' | 'large';
+  fontFamily: 'system' | 'inter' | 'roboto';
+  borderRadius: 'none' | 'small' | 'medium' | 'large';
+  compactMode: boolean;
+};
+
+export type DisplaySettings = {
+  language: 'id' | 'en';
+  dateFormat: 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+  timeFormat: '12h' | '24h';
+  timezone: string;
+  numberFormat: 'id' | 'en-US';
+  currencyFormat: 'IDR' | 'USD';
+  coordinateFormat: 'decimal' | 'dms';
+  showTooltips: boolean;
+  animationsEnabled: boolean;
+};
+
+export type NotificationSettings = {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  notifyOnApproval: boolean;
+  notifyOnReject: boolean;
+  notifyOnComment: boolean;
+  notifyOnMention: boolean;
+  notifyOnDataUpdate: boolean;
+  notifyOnSystemAlert: boolean;
+  digestFrequency: 'realtime' | 'hourly' | 'daily' | 'weekly' | 'never';
+  quietHours: {
+    enabled: boolean;
+    start: string; // HH:mm
+    end: string; // HH:mm
+  };
+};
+
+export type DashboardSettings = {
+  defaultView: 'overview' | 'data-management' | 'vocabularies' | 'metadata';
+  layout: 'grid' | 'list';
+  cardsPerRow: 2 | 3 | 4;
+  showQuickActions: boolean;
+  showStatistics: boolean;
+  showRecentActivity: boolean;
+  autoRefresh: boolean;
+  refreshInterval: number; // seconds
+  pinnedItems: string[]; // IDs of pinned dashboard items
+};
+
+export type AccessibilitySettings = {
+  highContrast: boolean;
+  reduceMotion: boolean;
+  screenReaderOptimized: boolean;
+  keyboardNavigationOnly: boolean;
+  focusIndicator: 'default' | 'enhanced';
+};
