@@ -59,9 +59,10 @@ export function AddUserForm({ setOpen }: AddUserFormProps) {
       email: '',
       password: '',
       confirmPassword: '',
-      role: 'SKK-Consumer',
+      role: 'SKK-Consumer' as const,
       organization: '',
     },
+    mode: 'onChange', // Add validation mode
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
