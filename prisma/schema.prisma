@@ -1978,3 +1978,269 @@ enum FacilityStatus {
   ABANDONED
 }
 
+// =============================================================================
+// METADATA MANAGEMENT SYSTEM
+// =============================================================================
+
+// Dataset Metadata Model
+model DatasetMetadata {
+  id          String              @id @default(uuid()) @db.Uuid
+  title       String              @db.VarChar(255)
+  description String?
+  schema      Json                @db.JsonB
+  source      String?             @db.VarChar(255)
+  ownerId     String              @db.Uuid @map("owner_id")
+  tags        String[]
+  category    String?             @db.VarChar(100)
+  domain      String?             @db.VarChar(100)
+  status      MetadataStatus      @default(DRAFT)
+  version     Int                 @default(1)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+  createdBy   String?             @db.Uuid @map("created_by")
+  updatedBy   String?             @db.Uuid @map("updated_by")
+
+  // Relations
+  qualityRules      QualityRule[]           @relation("DatasetQualityRules")
+  qualityIssues     QualityIssue[]          @relation("DatasetQualityIssues")
+  qualityReports    QualityReport[]         @relation("DatasetQualityReports")
+  datasetAccess     DatasetAccess[]         @relation("DatasetAccessControl")
+  accessRequests    AccessRequest[]         @relation("DatasetAccessRequests")
+  approvalSubmissions ApprovalSubmission[]  @relation("DatasetApprovals")
+  approvalHistory   ApprovalHistory[]       @relation("DatasetApprovalHistory")
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([category])
+  @@index([domain])
+  @@map("dataset_metadata")
+}
+
+// Quality Rule Model
+model QualityRule {
+  id          String              @id @default(uuid()) @db.Uuid
+  datasetId   String              @db.Uuid @map("dataset_id")
+  name        String              @db.VarChar(255)
+  description String?
+  type        QualityRuleType
+  condition   String
+  severity    QualitySeverity     @default(MEDIUM)
+  isActive    Boolean             @default(true) @map("is_active")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  createdBy   String?             @db.Uuid @map("created_by")
+
+  // Relations
+  dataset     DatasetMetadata     @relation("DatasetQualityRules", fields: [datasetId], references: [id], onDelete: Cascade)
+  issues      QualityIssue[]      @relation("RuleQualityIssues")
+
+  @@index([datasetId])
+  @@index([type])
+  @@map("quality_rules")
+}
+
+// Quality Issue Model
+model QualityIssue {
+  id          String              @id @default(uuid()) @db.Uuid
+  datasetId   String              @db.Uuid @map("dataset_id")
+  ruleId      String?             @db.Uuid @map("rule_id")
+  ruleName    String              @db.VarChar(255) @map("rule_name")
+  description String
+  severity    QualitySeverity
+  field       String?             @db.VarChar(255)
+  rowCount    Int?                @map("row_count")
+  detectedAt  DateTime            @default(now()) @map("detected_at")
+  status      IssueStatus         @default(OPEN)
+  resolvedAt  DateTime?           @map("resolved_at")
+  resolvedBy  String?             @db.Uuid @map("resolved_by")
+
+  // Relations
+  dataset     DatasetMetadata     @relation("DatasetQualityIssues", fields: [datasetId], references: [id], onDelete: Cascade)
+  rule        QualityRule?        @relation("RuleQualityIssues", fields: [ruleId], references: [id], onDelete: SetNull)
+
+  @@index([datasetId])
+  @@index([status])
+  @@index([severity])
+  @@map("quality_issues")
+}
+
+// Quality Report Model
+model QualityReport {
+  id                String              @id @default(uuid()) @db.Uuid
+  datasetId         String              @db.Uuid @map("dataset_id")
+  overallScore      Float               @map("overall_score") // 0-100
+  completenessScore Float               @map("completeness_score") // 0-100
+  consistencyScore  Float               @map("consistency_score") // 0-100
+  accuracyScore     Float               @map("accuracy_score") // 0-100
+  validityScore     Float               @map("validity_score") // 0-100
+  uniquenessScore   Float               @map("uniqueness_score") // 0-100
+  totalIssues       Int                 @default(0) @map("total_issues")
+  criticalIssues    Int                 @default(0) @map("critical_issues")
+  highIssues        Int                 @default(0) @map("high_issues")
+  mediumIssues      Int                 @default(0) @map("medium_issues")
+  lowIssues         Int                 @default(0) @map("low_issues")
+  checkedAt         DateTime            @default(now()) @map("checked_at")
+  checkedBy         String?             @db.Uuid @map("checked_by")
+
+  // Relations
+  dataset           DatasetMetadata     @relation("DatasetQualityReports", fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@index([datasetId])
+  @@index([checkedAt])
+  @@map("quality_reports")
+}
+
+// Dataset Access Model
+model DatasetAccess {
+  id          String              @id @default(uuid()) @db.Uuid
+  datasetId   String              @db.Uuid @map("dataset_id")
+  userId      String              @db.Uuid @map("user_id")
+  role        AccessRole
+  grantedBy   String              @db.Uuid @map("granted_by")
+  grantedAt   DateTime            @default(now()) @map("granted_at")
+
+  // Relations
+  dataset     DatasetMetadata     @relation("DatasetAccessControl", fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@unique([datasetId, userId])
+  @@index([datasetId])
+  @@index([userId])
+  @@map("dataset_access")
+}
+
+// Access Request Model
+model AccessRequest {
+  id            String              @id @default(uuid()) @db.Uuid
+  datasetId     String              @db.Uuid @map("dataset_id")
+  userId        String              @db.Uuid @map("user_id")
+  userName      String              @db.VarChar(255) @map("user_name")
+  userEmail     String              @db.VarChar(255) @map("user_email")
+  requestedRole AccessRole          @map("requested_role")
+  reason        String?
+  status        RequestApprovalStatus @default(PENDING)
+  requestedAt   DateTime            @default(now()) @map("requested_at")
+  reviewedBy    String?             @db.Uuid @map("reviewed_by")
+  reviewedAt    DateTime?           @map("reviewed_at")
+  reviewNotes   String?             @map("review_notes")
+
+  // Relations
+  dataset       DatasetMetadata     @relation("DatasetAccessRequests", fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@index([datasetId])
+  @@index([userId])
+  @@index([status])
+  @@map("access_requests")
+}
+
+// Approval Submission Model
+model ApprovalSubmission {
+  id              String              @id @default(uuid()) @db.Uuid
+  datasetId       String              @db.Uuid @map("dataset_id")
+  datasetName     String              @db.VarChar(255) @map("dataset_name")
+  submittedBy     String              @db.Uuid @map("submitted_by")
+  submitterName   String              @db.VarChar(255) @map("submitter_name")
+  submitterEmail  String              @db.VarChar(255) @map("submitter_email")
+  submissionType  SubmissionType      @map("submission_type")
+  description     String
+  changes         Json?               @db.JsonB
+  status          ApprovalStatus      @default(PENDING)
+  priority        SubmissionPriority  @default(NORMAL)
+  submittedAt     DateTime            @default(now()) @map("submitted_at")
+  reviewedBy      String?             @db.Uuid @map("reviewed_by")
+  reviewerName    String?             @db.VarChar(255) @map("reviewer_name")
+  reviewedAt      DateTime?           @map("reviewed_at")
+  reviewNotes     String?             @map("review_notes")
+
+  // Relations
+  dataset         DatasetMetadata     @relation("DatasetApprovals", fields: [datasetId], references: [id], onDelete: Cascade)
+  history         ApprovalHistory[]   @relation("SubmissionHistory")
+
+  @@index([datasetId])
+  @@index([status])
+  @@index([priority])
+  @@index([submittedAt])
+  @@map("approval_submissions")
+}
+
+// Approval History Model
+model ApprovalHistory {
+  id              String              @id @default(uuid()) @db.Uuid
+  datasetId       String              @db.Uuid @map("dataset_id")
+  submissionId    String              @db.Uuid @map("submission_id")
+  action          HistoryAction
+  performedBy     String              @db.Uuid @map("performed_by")
+  performerName   String              @db.VarChar(255) @map("performer_name")
+  notes           String?
+  timestamp       DateTime            @default(now())
+
+  // Relations
+  dataset         DatasetMetadata     @relation("DatasetApprovalHistory", fields: [datasetId], references: [id], onDelete: Cascade)
+  submission      ApprovalSubmission  @relation("SubmissionHistory", fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([datasetId])
+  @@index([submissionId])
+  @@index([timestamp])
+  @@map("approval_history")
+}
+
+// Metadata Management Enums
+enum MetadataStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum QualityRuleType {
+  COMPLETENESS
+  CONSISTENCY
+  ACCURACY
+  VALIDITY
+  UNIQUENESS
+}
+
+enum QualitySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IssueStatus {
+  OPEN
+  RESOLVED
+  IGNORED
+}
+
+enum AccessRole {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+enum RequestApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SubmissionType {
+  NEW
+  UPDATE
+  DELETE
+}
+
+enum ApprovalStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum HistoryAction {
+  SUBMITTED
+  REVIEWED
+  APPROVED
+  REJECTED
+  COMMENTED
+}
+

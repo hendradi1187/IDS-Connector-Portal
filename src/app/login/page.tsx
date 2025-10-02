@@ -43,6 +43,34 @@ export default function LoginPage() {
     }
   };
 
+  const handleDemoLogin = async (role: 'admin' | 'kkks' | 'consumer') => {
+    setLoading(true);
+    try {
+      const demoCredentials = {
+        admin: { email: 'admin@skkmigas.go.id', password: '123456' },
+        kkks: { email: 'kkks@chevron.com', password: '123456' },
+        consumer: { email: 'consumer@skkmigas.go.id', password: '123456' }
+      };
+
+      const { email: demoEmail, password: demoPassword } = demoCredentials[role];
+      await login(demoEmail, demoPassword);
+
+      toast({
+        title: "Demo Login Successful",
+        description: `Logged in as ${role.toUpperCase()} demo account.`,
+      });
+
+      router.push('/');
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: "Demo Login Failed",
+        description: "Demo account may not be available. Please try manual login.",
+      });
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="w-full max-w-sm">
@@ -55,6 +83,16 @@ export default function LoginPage() {
             <CardDescription>
               Enter your credentials to access the portal.
             </CardDescription>
+
+            {/* Role Information */}
+            <div className="mt-4 p-3 bg-muted rounded-lg text-sm">
+              <p className="font-medium mb-2">Available Roles:</p>
+              <div className="space-y-1 text-xs">
+                <div><strong>Admin:</strong> Manage metadata, approve access, full control</div>
+                <div><strong>KKKS-Provider:</strong> Upload datasets, manage own metadata</div>
+                <div><strong>SKK-Consumer:</strong> View and analyze available data</div>
+              </div>
+            </div>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="grid gap-4">
@@ -101,6 +139,40 @@ export default function LoginPage() {
               <Button variant="outline" className="w-full" type="button" disabled={loading}>
                 Sign in with SSO
               </Button>
+
+              {/* Demo Accounts */}
+              <div className="grid gap-2">
+                <p className="text-sm font-medium text-center">Quick Demo Access:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => handleDemoLogin('admin')}
+                    disabled={loading}
+                  >
+                    Admin
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => handleDemoLogin('kkks')}
+                    disabled={loading}
+                  >
+                    KKKS
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => handleDemoLogin('consumer')}
+                    disabled={loading}
+                  >
+                    Consumer
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </form>
         </Card>

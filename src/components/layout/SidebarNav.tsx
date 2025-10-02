@@ -71,7 +71,7 @@ const menuGroups: MenuGroup[] = [
     icon: Database,
     collapsible: true,
     items: [
-      { href: '/data-management', icon: Database, label: 'Metadata' },
+      { href: '/metadata', icon: Database, label: 'Metadata' },
       { href: '/mdm-geometry', icon: BookOpen, label: 'Catalog' },
       { href: '/vocabularies', icon: BookOpen, label: 'Vocabularies' },
     ]

@@ -23,7 +23,10 @@
       "Bash(git add:*)",
       "Bash(xargs sed:*)",
       "Bash(docker build:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Read(//d/Pictures/Screenshots/**)",
+      "Bash(docker-compose:*)",
+      "Bash(ss:*)"
     ],
     "deny": [],
     "ask": []
