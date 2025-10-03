@@ -83,16 +83,6 @@ export default function LoginPage() {
             <CardDescription>
               Enter your credentials to access the portal.
             </CardDescription>
-
-            {/* Role Information */}
-            <div className="mt-4 p-3 bg-muted rounded-lg text-sm">
-              <p className="font-medium mb-2">Available Roles:</p>
-              <div className="space-y-1 text-xs">
-                <div><strong>Admin:</strong> Manage metadata, approve access, full control</div>
-                <div><strong>KKKS-Provider:</strong> Upload datasets, manage own metadata</div>
-                <div><strong>SKK-Consumer:</strong> View and analyze available data</div>
-              </div>
-            </div>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="grid gap-4">
