@@ -60,15 +60,15 @@ body {
     --chart-4: 4 90% 58%; /* Red Safety */
     --chart-5: 174 100% 33%; /* Bright Green */
 
-    /* Sidebar - Professional Dark */
-    --sidebar-background: 210 50% 8%; /* Dark Blue-Gray */
+    /* Sidebar - Navy Blue Theme (matching login page) */
+    --sidebar-background: 215 35% 12%; /* #0f1629 - Navy Blue */
     --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 207 96% 30%; /* Industrial Blue */
+    --sidebar-primary: 188 95% 55%; /* Cyan accent */
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 210 30% 12%;
+    --sidebar-accent: 215 30% 16%; /* #1a2332 - Slightly lighter navy */
     --sidebar-accent-foreground: 210 20% 90%;
-    --sidebar-border: 210 30% 15%;
-    --sidebar-ring: 207 96% 30%;
+    --sidebar-border: 215 30% 18%;
+    --sidebar-ring: 188 95% 55%;
   }
   .dark {
     /* Industrial Energy Color Scheme - Dark Mode (Control Room) */
@@ -122,15 +122,15 @@ body {
     --chart-4: 4 85% 60%; /* Bright Red */
     --chart-5: 174 95% 45%; /* Extra Bright Green */
 
-    /* Sidebar - Control Room Style */
-    --sidebar-background: 210 45% 3%; /* Very Dark Blue */
-    --sidebar-foreground: 210 20% 85%;
-    --sidebar-primary: 207 85% 45%; /* Bright Industrial Blue */
-    --sidebar-primary-foreground: 210 40% 4%;
-    --sidebar-accent: 210 35% 8%;
-    --sidebar-accent-foreground: 210 20% 85%;
-    --sidebar-border: 210 30% 12%;
-    --sidebar-ring: 207 85% 45%;
+    /* Sidebar - Navy Blue Theme (matching login page) */
+    --sidebar-background: 215 35% 12%; /* #0f1629 - Navy Blue */
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 188 95% 55%; /* Cyan accent */
+    --sidebar-primary-foreground: 215 35% 12%;
+    --sidebar-accent: 215 30% 16%; /* #1a2332 - Slightly lighter navy */
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 215 30% 18%;
+    --sidebar-ring: 188 95% 55%;
   }
 }
 

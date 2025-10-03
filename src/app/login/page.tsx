@@ -73,22 +73,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 via-cyan-100 to-blue-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0f1629] via-[#1a2332] to-[#0f1629]">
       <div className="w-full max-w-md px-4">
         {/* Logo Section - Outside Card for Better Visibility */}
         <div className="mb-8">
           <AnimatedLogo size="xl" className="mb-4" />
-          <p className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <p className="text-center text-sm font-semibold text-gray-300">
             Secure Data Space Connector Platform
           </p>
         </div>
 
-        <Card className="shadow-2xl border-2 backdrop-blur-sm bg-white dark:bg-background/95">
+        <Card className="shadow-2xl border backdrop-blur-sm bg-[#1a2332]/50 border-slate-700/50">
           <CardHeader className="text-center space-y-2">
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
               Portal Login
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Enter your credentials to access the platform
             </CardDescription>
           </CardHeader>
@@ -111,7 +111,7 @@ export default function LoginPage() {
                   <Label htmlFor="password">Password</Label>
                   <Link
                     href="#"
-                    className="ml-auto inline-block text-sm underline"
+                    className="ml-auto inline-block text-sm underline text-cyan-400 hover:text-cyan-300"
                   >
                     Forgot your password?
                   </Link>
@@ -129,18 +129,18 @@ export default function LoginPage() {
                 {loading ? "Signing in..." : "Sign in"}
               </Button>
                <div className="relative my-4">
-                  <Separator />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 bg-background text-xs text-muted-foreground">
+                  <Separator className="bg-slate-700/50" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 bg-[#1a2332] text-xs text-gray-400">
                     OR
                   </div>
                 </div>
-              <Button variant="outline" className="w-full" type="button" disabled={loading}>
+              <Button variant="outline" className="w-full border-slate-600 hover:bg-slate-800 hover:text-white" type="button" disabled={loading}>
                 Sign in with SSO
               </Button>
 
               {/* Demo Accounts */}
               <div className="grid gap-2">
-                <p className="text-sm font-medium text-center">Quick Demo Access:</p>
+                <p className="text-sm font-medium text-center text-gray-300">Quick Demo Access:</p>
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant="outline"
@@ -148,6 +148,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => handleDemoLogin('admin')}
                     disabled={loading}
+                    className="border-slate-600 hover:bg-slate-800 hover:text-white"
                   >
                     Admin
                   </Button>
@@ -157,6 +158,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => handleDemoLogin('kkks')}
                     disabled={loading}
+                    className="border-slate-600 hover:bg-slate-800 hover:text-white"
                   >
                     KKKS
                   </Button>
@@ -166,6 +168,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => handleDemoLogin('consumer')}
                     disabled={loading}
+                    className="border-slate-600 hover:bg-slate-800 hover:text-white"
                   >
                     Consumer
                   </Button>
@@ -175,11 +178,11 @@ export default function LoginPage() {
           </form>
         </Card>
         <div className="mt-6 space-y-2">
-          <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+          <p className="text-center text-xs text-gray-400 flex items-center justify-center gap-2">
             <Shield className="h-3 w-3" />
             Your session is secure and encrypted
           </p>
-          <p className="text-center text-xs text-muted-foreground/60">
+          <p className="text-center text-xs text-gray-500">
             © 2025 RapIDSK - International Data Spaces Connector
           </p>
         </div>

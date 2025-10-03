@@ -152,22 +152,22 @@ export default function SidebarNav() {
 
   return (
     <>
-      <SidebarHeader className="border-b border-sidebar-border p-4">
+      <SidebarHeader className="border-b border-sidebar-border px-4 py-6">
         <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
-          <div className="relative h-10 w-full flex items-center">
+          <div className="relative w-full flex items-center justify-center">
             <Image
               src="/logo-rapidsk.png"
               alt="RapIDSK"
-              width={180}
-              height={60}
+              width={280}
+              height={100}
               priority
-              className="h-10 w-auto object-contain"
+              className="h-auto w-full max-w-[200px] object-contain"
             />
           </div>
         </Link>
-        <div className="mt-2 flex items-center gap-2">
-          <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-          <p className="text-xs text-muted-foreground font-medium">
+        <div className="mt-4 flex items-center gap-2 justify-center">
+          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+          <p className="text-sm text-muted-foreground font-semibold">
             {user?.role === 'Admin' ? 'Admin Control' :
              user?.role === 'KKKS-Provider' ? 'Data Provider' :
              'Data Consumer'}
