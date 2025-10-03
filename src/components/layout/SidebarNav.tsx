@@ -41,6 +41,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface MenuItem {
   href: string;
@@ -151,19 +152,26 @@ export default function SidebarNav() {
 
   return (
     <>
-      <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2.5">
-          <Shield className="h-8 w-8 text-primary" />
-          <div className="flex flex-col">
-            <h2 className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-              IDS Portal
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              {user?.role === 'Admin' ? 'Admin Control' :
-               user?.role === 'KKKS-Provider' ? 'Data Provider' :
-               'Data Consumer'}
-            </p>
+      <SidebarHeader className="border-b border-sidebar-border p-4">
+        <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+          <div className="relative h-10 w-full flex items-center">
+            <Image
+              src="/logo-rapidsk.png"
+              alt="RapIDSK"
+              width={180}
+              height={60}
+              priority
+              className="h-10 w-auto object-contain"
+            />
           </div>
+        </Link>
+        <div className="mt-2 flex items-center gap-2">
+          <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+          <p className="text-xs text-muted-foreground font-medium">
+            {user?.role === 'Admin' ? 'Admin Control' :
+             user?.role === 'KKKS-Provider' ? 'Data Provider' :
+             'Data Consumer'}
+          </p>
         </div>
       </SidebarHeader>
       <SidebarContent>

@@ -1,62 +1,98 @@
 # docker-compose.yml
+# Production-ready configuration with Nginx reverse proxy
+#
+# Usage:
+#   docker compose up -d
+#
+# Features:
+#   - Nginx reverse proxy for SSL termination and load balancing
+#   - PostgreSQL database with persistent storage
+#   - Health checks for database readiness
+#   - Automatic restart on failure
+#   - Isolated network for security
+#
+# Access:
+#   - HTTP:  http://your-domain.com:8080
+#   - HTTPS: https://your-domain.com:8443 (requires SSL certificates)
 
 version: '3.8'
 
 services:
-  # 1. Layanan Aplikasi Next.js
+  # Next.js Application Service
   app:
-    build: . # Membangun image dari Dockerfile di direktori saat ini
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: ids_portal_app
     restart: unless-stopped
     env_file:
-      - .env.production # Memuat variabel dari file .env.production
+      - .env.production
     depends_on:
       db:
-        condition: service_healthy # Menunggu sampai database benar-benar siap
+        condition: service_healthy
     networks:
       - app-network
+    # Do not expose ports - access only via nginx proxy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  # 2. Layanan Database (PostgreSQL)
+  # PostgreSQL Database Service
   db:
     image: postgres:15-alpine
     container_name: ids_portal_db
     restart: unless-stopped
     environment:
-      # Variabel ini akan diambil dari .env.production
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      # Security: Disable trust authentication
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Menyimpan data database secara persisten
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    # Do not expose ports in production for security
+    # Use docker-compose.dev.yml if you need direct access
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - app-network
+      start_period: 10s
 
-  # 3. Layanan Reverse Proxy (Nginx)
+  # Nginx Reverse Proxy Service
   nginx:
     image: nginx:1.25-alpine
     container_name: ids_portal_proxy
     restart: unless-stopped
     ports:
-      - "8080:80" # Port HTTP (changed to 8080 to avoid conflict)
-      - "8443:443" # Port HTTPS (changed to 8443 to avoid conflict)
+      - "8080:80"   # HTTP - Change to 80:80 in production
+      - "8443:443"  # HTTPS - Change to 443:443 in production
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Mount file konfigurasi Nginx
-      # - /path/to/your/certs:/etc/nginx/certs:ro # Uncomment jika Anda punya sertifikat SSL
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # Uncomment and configure SSL certificates for production:
+      # - ./certs:/etc/nginx/certs:ro
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-# Mendefinisikan volume untuk persistensi data
+# Persistent Data Volumes
 volumes:
   postgres_data:
+    driver: local
 
-# Mendefinisikan jaringan kustom
+# Internal Network
 networks:
   app-network:
     driver: bridge

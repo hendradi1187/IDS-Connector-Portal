@@ -32,6 +32,7 @@ import { deleteUser } from '@/app/users/actions';
 import { useToast } from '@/hooks/use-toast';
 import EditUserDialog from './EditUserDialog';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const roleVariants: { [key in User['role']]: 'default' | 'secondary' | 'outline' } = {
   Admin: 'default',
@@ -46,6 +47,7 @@ type UserTableRowProps = {
 export default function UserTableRow({ user }: UserTableRowProps) {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
+  const router = useRouter();
 
   // RBAC: Only Admin can manage users, and users can't delete themselves
   const canEditUser = currentUser?.role === 'Admin';
@@ -67,8 +69,8 @@ export default function UserTableRow({ user }: UserTableRowProps) {
         title: 'User Deleted',
         description: `User ${user.name} has been successfully deleted.`,
       });
-      // Force page reload to refresh user list
-      window.location.reload();
+      // Refresh the page using Next.js router
+      router.refresh();
     } catch (error) {
       console.error('Delete user error:', error);
       toast({

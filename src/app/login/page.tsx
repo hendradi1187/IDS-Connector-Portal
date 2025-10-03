@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { AnimatedLogo } from "@/components/ui/animated-logo";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -72,16 +73,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="w-full max-w-sm">
-        <Card>
-          <CardHeader className="text-center">
-             <div className="flex justify-center mb-4">
-               <Shield className="h-12 w-12 text-primary" />
-             </div>
-            <CardTitle className="text-2xl">IDS Connector Portal</CardTitle>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 via-cyan-100 to-blue-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="w-full max-w-md px-4">
+        {/* Logo Section - Outside Card for Better Visibility */}
+        <div className="mb-8">
+          <AnimatedLogo size="xl" className="mb-4" />
+          <p className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+            Secure Data Space Connector Platform
+          </p>
+        </div>
+
+        <Card className="shadow-2xl border-2 backdrop-blur-sm bg-white dark:bg-background/95">
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+              Portal Login
+            </CardTitle>
             <CardDescription>
-              Enter your credentials to access the portal.
+              Enter your credentials to access the platform
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
@@ -166,9 +174,15 @@ export default function LoginPage() {
             </CardContent>
           </form>
         </Card>
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-            Your session is secure and encrypted.
-        </p>
+        <div className="mt-6 space-y-2">
+          <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+            <Shield className="h-3 w-3" />
+            Your session is secure and encrypted
+          </p>
+          <p className="text-center text-xs text-muted-foreground/60">
+            © 2025 RapIDSK - International Data Spaces Connector
+          </p>
+        </div>
       </div>
     </div>
   );

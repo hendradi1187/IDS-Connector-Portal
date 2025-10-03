@@ -1,51 +1,77 @@
 # docker-compose.no-nginx.yml
-# Configuration without nginx proxy - use existing web server
+# Configuration without Nginx - For use with external web server/proxy
+#
+# Usage:
+#   docker compose -f docker-compose.no-nginx.yml up -d
+#
+# Use Cases:
+#   - You have an existing web server (Apache, Nginx, IIS, Caddy, etc.)
+#   - Using external reverse proxy (Cloudflare Tunnel, ngrok, etc.)
+#   - Running behind corporate proxy/load balancer
+#   - Kubernetes/orchestration manages routing
+#
+# Access:
+#   - App: http://localhost:3000 (direct access to Next.js)
+#   - DB:  postgresql://localhost:5432
+#
+# Note:
+#   Configure your external proxy to forward requests to http://localhost:3000
 
 version: '3.8'
 
 services:
-  # 1. Layanan Aplikasi Next.js
+  # Next.js Application Service
   app:
-    build: . # Membangun image dari Dockerfile di direktori saat ini
-    container_name: ids_portal_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ids_portal_app_standalone
     restart: unless-stopped
     ports:
-      - "3000:3000" # Direct access to Next.js app
+      - "3000:3000"  # Direct access - configure your external proxy to this port
     env_file:
-      - .env.production # Memuat variabel dari file .env.production
+      - .env.production
     depends_on:
       db:
-        condition: service_healthy # Menunggu sampai database benar-benar siap
+        condition: service_healthy
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  # 2. Layanan Database (PostgreSQL)
+  # PostgreSQL Database Service
   db:
     image: postgres:15-alpine
-    container_name: ids_portal_db
+    container_name: ids_portal_db_standalone
     restart: unless-stopped
     environment:
-      # Variabel ini akan diambil dari .env.production
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Menyimpan data database secara persisten
+      - postgres_data_standalone:/var/lib/postgresql/data
     ports:
-      - "5432:5432" # Expose PostgreSQL port for external access
+      - "5432:5432"  # Exposed for direct access (pgAdmin, DBeaver, etc.)
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
     networks:
       - app-network
 
-# Mendefinisikan volume untuk persistensi data
+# Persistent Data Volumes
 volumes:
-  postgres_data:
+  postgres_data_standalone:
+    driver: local
 
-# Mendefinisikan jaringan kustom
+# Internal Network
 networks:
   app-network:
     driver: bridge
